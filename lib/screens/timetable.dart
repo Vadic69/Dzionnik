@@ -185,10 +185,11 @@ class TimetableState extends State<Timetable> {
         }
       }
       if (lesson <= bells.length)
-        timer = Timer.periodic(Duration(minutes: 1), (timer) {
+        timer = Timer.periodic(Duration(seconds: 1), (timer) {
           if (this.mounted)
             setState(() {
-              counter--;
+              var now = DateTime.now();
+              counter = (start ? bells[lesson-1].end : bells[lesson-1].begin) - (now.hour*60 + now.minute);
               if (counter <= 0) {
                 if (start) {
                   start = false;
@@ -196,14 +197,12 @@ class TimetableState extends State<Timetable> {
                   if (lesson - 1 >= bells.length) {
                     print('stop');
                     timer.cancel();
-                  } else
-                    counter = bells[lesson - 1].begin - bells[lesson - 2].end;
+                  } //else counter = bells[lesson - 1].begin - bells[lesson - 2].end;
                 } else {
                   start = true;
                   if (lesson - 1 >= bells.length)
                     timer.cancel();
-                  else
-                    counter = bells[lesson - 1].end - bells[lesson - 1].begin;
+                  //else counter = bells[lesson - 1].end - bells[lesson - 1].begin;
                 }
               }
             });
@@ -344,7 +343,7 @@ class TimetableState extends State<Timetable> {
                 child: ListTile(
                     title: Text(data[i].name),
                     subtitle: Text(getTime(bells[j].begin, bells[j].end)),
-                    leading: j >= lesson - 1
+                    leading: ((j >= lesson - 1 && data[i].weekday == DateTime.now().weekday) || data[i].weekday > DateTime.now().weekday)
                         ? Container(
                             width: 30,
                             height: 40,
@@ -355,7 +354,7 @@ class TimetableState extends State<Timetable> {
                             child: Center(
                                 child: Icon(Icons.alarm_on,
                                     color: SoftColors.green))),
-                    trailing: ret.length == lesson - 1
+                    trailing: (ret.length == lesson - 1 && data[i].weekday == DateTime.now().weekday)
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
