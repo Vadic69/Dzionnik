@@ -209,9 +209,8 @@ class MarksListState extends State<MarksList> {
       appBar: AppBar(
           centerTitle: true,
           //leading: Logo(),
-          leading: Container(
-            child: SvgPicture.asset('assets/Dzlogo.svg'),
-            padding: EdgeInsets.all(10),
+          iconTheme: IconThemeData(
+            color: SoftColors.blueDark
           ),
           title: Text(
             subject.name,
