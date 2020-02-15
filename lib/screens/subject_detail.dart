@@ -6,7 +6,6 @@ import 'package:school_diary/constants.dart';
 import 'package:school_diary/widgets/Mark_card.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../database_helper.dart';
 

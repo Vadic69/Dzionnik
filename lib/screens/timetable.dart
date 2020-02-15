@@ -211,7 +211,12 @@ class TimetableState extends State<Timetable> {
   }
 
   void buildDatesList() {
+    bool sunday = false;
     var now = DateTime.now();
+    if (now.weekday == 7) {
+      now = now.add(Duration(days: 1));
+      sunday = true;
+    }
     int d = 1 - now.weekday;
     while (d <= 0) {
       //print(-d);
@@ -222,7 +227,7 @@ class TimetableState extends State<Timetable> {
       selected.add(false);
       d++;
     }
-    active[active.length - 1] = true;
+    if (!sunday) active[active.length - 1] = true;
     selected[active.length - 1] = true;
     currentSelected = active.length - 1;
     while (number.length < 6) {
