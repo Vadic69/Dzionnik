@@ -29,6 +29,10 @@ class DatabaseHelper{
   String weekday = 'weekday';
   String scheduleitems = 'scheduleitems';
 
+  String begin = 'begin';
+  String end = 'end';
+  String bells = 'bells';
+
 
   DatabaseHelper._createInstance();
 
@@ -60,6 +64,7 @@ class DatabaseHelper{
     await db.execute('CREATE TABLE $tableName($id INTEGER PRIMARY KEY AUTOINCREMENT, $name TEXT, $averageScore FLOAT, $marksKol INTEGER)');
     await db.execute('CREATE TABLE $marks($markId INTEGER PRIMARY KEY AUTOINCREMENT, $value INTEGER, $subjectId INTEGER)');
     await db.execute('CREATE TABLE $scheduleitems($id INTEGER PRIMARY KEY AUTOINCREMENT, $weekday INTEGER, $name TEXT)');
+    await db.execute('CREATE TABLE $bells($order INTEGER PRIMARY KEY, $begin INTEGER, $end INTEGER)');
   }
 
   Future <List<Map<String,dynamic>>> getSubjectsMapList() async{

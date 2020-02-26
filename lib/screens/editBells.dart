@@ -10,6 +10,13 @@ class EditBells extends StatefulWidget {
 }
 
 class EditBellsState extends State<EditBells>{
+
+  List<Widget> buildList (){
+    for (int i=1; i<=8; i++){
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +38,6 @@ class EditBellsState extends State<EditBells>{
               height: 1,
               color: SoftColors.blueDark.withOpacity(0.5),
               width: MediaQuery.of(context).size.width * 0.9,
-              //margin: EdgeInsets.only(bottom: 20),
             ),
           )),
       body: Container(
@@ -43,7 +49,7 @@ class EditBellsState extends State<EditBells>{
               color: Colors.white,
               child: ListView(
                 children: <Widget>[
-                  
+
                 ],
               ),
             )
