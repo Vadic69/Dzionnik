@@ -52,8 +52,7 @@ class SubjectsListState extends State<SubjectsList> {
           ),
           title: Text(
             "Предметы",
-            style: TextStyle(
-                fontSize: 25, color: Colors.black, fontWeight: FontWeight.w600),
+            style: Styles.appBarTextStyle
           ),
           backgroundColor: SoftColors.blueLight,
           elevation: 0,

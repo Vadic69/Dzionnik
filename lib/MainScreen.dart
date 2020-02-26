@@ -25,8 +25,6 @@ int currentPage = 1;
 
 class MainScreenState extends State<MainScreen> {
 
-
-
   Widget BottomItem (Widget child, int index){
     return GestureDetector(
       onTap: (){
@@ -60,8 +58,6 @@ class MainScreenState extends State<MainScreen> {
             children: <Widget>[
               BottomItem(Text('7,3', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: SoftColors.blueDark),), 0),
               BottomItem(Icon(Icons.timer, color: SoftColors.blueDark,), 1),
-              BottomItem(Icon(Icons.recent_actors, color: SoftColors.blueDark), 2),
-              BottomItem(Icon(Icons.question_answer, color: SoftColors.blueDark), 3),
             ],
           ),
           height: 80,
@@ -78,23 +74,6 @@ class MainScreenState extends State<MainScreen> {
           ),
         ),
       ),
-      /*floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: GestureDetector(
-        //onTap: navigateToAddScreen,
-        onTap: (){},
-        child: Container(
-          width: 60,
-          height: 60,
-          child: Icon(
-            Icons.add,
-            color: SoftColors.blueDark,
-          ),
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: SoftColors.blueLight,
-              boxShadow: UnpressedShadow.shadow),
-        ),
-      ),*/
       body: screens[currentPage],
     );
   }

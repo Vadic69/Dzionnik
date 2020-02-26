@@ -213,8 +213,7 @@ class MarksListState extends State<MarksList> {
           ),
           title: Text(
             subject.name,
-            style: TextStyle(
-                fontSize: 25, color: Colors.black, fontWeight: FontWeight.w600),
+            style: Styles.appBarTextStyle
           ),
           backgroundColor: SoftColors.blueLight,
           elevation: 0,

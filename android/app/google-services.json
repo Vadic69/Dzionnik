@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "261943797876",
+    "firebase_url": "https://dzionnik-2661d.firebaseio.com",
+    "project_id": "dzionnik-2661d",
+    "storage_bucket": "dzionnik-2661d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261943797876:android:7b68ebdc82de7d6f864921",
+        "android_client_info": {
+          "package_name": "vadimkozlov.dzionnik"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "261943797876-92cubtgds1v1olb6smq868otifbsq6m9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWOuKKTdhILxEvDIATRScM2FMRdVMPdgU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "261943797876-92cubtgds1v1olb6smq868otifbsq6m9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

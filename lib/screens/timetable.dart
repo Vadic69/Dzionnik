@@ -7,6 +7,7 @@ import 'package:school_diary/constants.dart';
 import 'package:school_diary/database_helper.dart';
 import 'package:school_diary/models/bell.dart';
 import 'package:school_diary/models/scheduleItem.dart';
+import 'package:school_diary/screens/editBells.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Timetable extends StatefulWidget {
@@ -43,7 +44,7 @@ class TimetableState extends State<Timetable> {
 
   void addToDB(ScheduleItem item) async {
     int res = await DBhelper.insertScheduleItem(item);
-    if (res != 0){
+    if (res != 0) {
       print("Success!");
     } else {
       print("ERROR!");
@@ -70,7 +71,7 @@ class TimetableState extends State<Timetable> {
                   height: 45,
                   child: Text("Удалить",
                       style:
-                      TextStyle(color: SoftColors.blueLight, fontSize: 20)),
+                          TextStyle(color: SoftColors.blueLight, fontSize: 20)),
                   radius: BorderRadius.circular(15),
                   color: SoftColors.red.withOpacity(0.8),
                   //textColor: Colors.white,
@@ -104,7 +105,7 @@ class TimetableState extends State<Timetable> {
 
     titleController.text = item.name;
 
-    String name = "";
+    String name = item.name;
     Alert(
         context: context,
         title: add ? 'Добавить' : 'Редактировать',
@@ -144,7 +145,9 @@ class TimetableState extends State<Timetable> {
                   //textColor: Colors.white,
                   onPressed: () {
                     item.name = name;
-                    add ? DBhelper.insertScheduleItem(item) : DBhelper.updateSchedule(item);
+                    add
+                        ? DBhelper.insertScheduleItem(item)
+                        : DBhelper.updateSchedule(item);
                     Navigator.of(context).pop();
                     updateList();
                   },
@@ -189,7 +192,9 @@ class TimetableState extends State<Timetable> {
           if (this.mounted)
             setState(() {
               var now = DateTime.now();
-              counter = (start ? bells[lesson-1].end : bells[lesson-1].begin) - (now.hour*60 + now.minute);
+              counter =
+                  (start ? bells[lesson - 1].end : bells[lesson - 1].begin) -
+                      (now.hour * 60 + now.minute);
               if (counter <= 0) {
                 if (start) {
                   start = false;
@@ -200,8 +205,7 @@ class TimetableState extends State<Timetable> {
                   } //else counter = bells[lesson - 1].begin - bells[lesson - 2].end;
                 } else {
                   start = true;
-                  if (lesson - 1 >= bells.length)
-                    timer.cancel();
+                  if (lesson - 1 >= bells.length) timer.cancel();
                   //else counter = bells[lesson - 1].end - bells[lesson - 1].begin;
                 }
               }
@@ -342,13 +346,16 @@ class TimetableState extends State<Timetable> {
                 onLongPress: () {
                   showDeleteDialog(data[i]);
                 },
-                onPressed: (){
+                onPressed: () {
                   showEditItem(data[i], false);
                 },
                 child: ListTile(
                     title: Text(data[i].name),
                     subtitle: Text(getTime(bells[j].begin, bells[j].end)),
-                    leading: ((j >= lesson - 1 && data[i].weekday == DateTime.now().weekday) || data[i].weekday > DateTime.now().weekday)
+                    leading: ((j >= lesson - 1 &&
+                                data[i].weekday == DateTime.now().weekday) ||
+                            data[i].weekday > DateTime.now().weekday ||
+                            DateTime.now().weekday == 7)
                         ? Container(
                             width: 30,
                             height: 40,
@@ -359,7 +366,8 @@ class TimetableState extends State<Timetable> {
                             child: Center(
                                 child: Icon(Icons.alarm_on,
                                     color: SoftColors.green))),
-                    trailing: (ret.length == lesson - 1 && data[i].weekday == DateTime.now().weekday)
+                    trailing: (ret.length == lesson - 1 &&
+                            data[i].weekday == DateTime.now().weekday)
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
@@ -405,7 +413,7 @@ class TimetableState extends State<Timetable> {
     return ret;
   }
 
-  void updateList(){
+  void updateList() {
     final Future<Database> dbFuture = DBhelper.inicializeDatabase();
     dbFuture.then((database) {
       Future<List<ScheduleItem>> ListFuture = DBhelper.getScheduleItems();
@@ -428,7 +436,7 @@ class TimetableState extends State<Timetable> {
       buildDatesList();
     }
 
-    if (data==null){
+    if (data == null) {
       data = List<ScheduleItem>();
       updateList();
     }
@@ -440,7 +448,10 @@ class TimetableState extends State<Timetable> {
           actions: <Widget>[
             IconButton(
               //onTap: navigateToAddScreen,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => EditBells()));
+              },
               icon: Icon(
                 Icons.alarm,
                 color: SoftColors.blueDark,
@@ -456,8 +467,7 @@ class TimetableState extends State<Timetable> {
           ),
           title: Text(
             "Расписание",
-            style: TextStyle(
-                fontSize: 25, color: Colors.black, fontWeight: FontWeight.w600),
+            style: Styles.appBarTextStyle
           ),
           backgroundColor: SoftColors.blueLight,
           elevation: 0,

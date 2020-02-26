@@ -53,3 +53,11 @@ class SoftStyles {
     isCloseButton: false,
   );
 }
+
+class Styles {
+  static const appBarTextStyle = TextStyle(
+      fontSize: 22,
+      color: Colors.black,
+      fontWeight: FontWeight.w600
+  );
+}
