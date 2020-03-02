@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:school_diary/constants.dart';
+import 'package:school_diary/database_helper.dart';
+import 'package:school_diary/models/bell.dart';
 
 class EditBells extends StatefulWidget {
   @override
@@ -12,15 +16,89 @@ class EditBells extends StatefulWidget {
 
 class EditBellsState extends State<EditBells>{
 
+
+  DatabaseHelper dbHelper = DatabaseHelper();
+  GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
+
+  List<Bell> bells = List<Bell>();
+
+  String getTime(int s) {
+    String ret;
+    String h = (s ~/ 60).toString(), m = (s % 60).toString();
+    if (m.length < 2) m = '0' + m;
+    ret = h + ':' + m;
+    return ret;
+  }
+
+  void updateBellsList() async {
+    bells = await dbHelper.getBells();
+    setState(() {
+
+    });
+  }
+
+  void updateBell(int order, int value, bool b){
+    if (b) {
+      if (order>0 && value<bells[order-1].end){
+        _key.currentState.showSnackBar(SnackBar(
+          content: Text(
+            "Ошибка. Урок должен начинаться после окончания предыдущего.",
+            style: TextStyle(
+              fontSize: 15
+            ),),
+          backgroundColor: SoftColors.red,
+        ));
+        return;
+      }
+      bells[order].begin = value;
+      bells[order].end = value+45;
+      int i=order;
+      while (i<bells.length-1 && bells[i].end>bells[i+1].begin) {
+        bells[i+1].begin = bells[i].end;
+        bells[i+1].end = bells[i+1].begin+45;
+        dbHelper.updateBell(bells[i+1]);
+        i++;
+      }
+      dbHelper.updateBell(bells[order]);
+    }
+    else {
+      bells[order].end = value;
+      dbHelper.updateBell(bells[order]);
+      int i=order;
+      while (i<bells.length-1 && bells[i].end>bells[i+1].begin) {
+        bells[i+1].begin = bells[i].end;
+        bells[i+1].end = bells[i+1].begin+45;
+        dbHelper.updateBell(bells[i+1]);
+        i++;
+      }
+      _key.currentState.showSnackBar(SnackBar(
+          content: Text(
+            "Расписание звонков обновлено",
+            style: TextStyle(
+              fontSize: 15
+            ),),
+            backgroundColor: SoftColors.green,
+        ));
+    }
+  }
+
   Future<Null> selectTime(BuildContext context, int order, bool b) async {
+
+    int currentHours = ((b) ? bells[order].begin : bells[order].end) ~/ 60;
+    int currentMinutes = ((b) ? bells[order].begin : bells[order].end) % 60;
 
     DatePicker.showTimePicker(
       context,
       showTitleActions: true,
       locale: LocaleType.ru,
       showSecondsColumn: false,
+      currentTime: DateTime(2016, 12, 21, currentHours, currentMinutes),
       onConfirm: (time){
-        print(time.minute);
+        setState(() {
+          int min = time.minute;
+          int h = time.hour;
+          updateBell(order, h*60+min, b);
+        });
       }
     );
 
@@ -30,13 +108,16 @@ class EditBellsState extends State<EditBells>{
 
     double margin, width, height, screenWidth;
     screenWidth = MediaQuery.of(context).size.width;
-    print(screenWidth);
     margin = 20;
     width = ((screenWidth-4*margin)/2)-1;
-    print(width);
+
+    TextStyle timeStyle = TextStyle(
+      color: SoftColors.blueDark, 
+      fontSize: 16
+    );
 
     List<Widget> ret = List<Widget>();
-    for (int i=0; i<8; i++)
+    for (int i=0; i<bells.length; i++)
       ret.add(Container(
         decoration: BoxDecoration(
           boxShadow: UnpressedShadow.shadow,
@@ -71,10 +152,10 @@ class EditBellsState extends State<EditBells>{
                   height: width/2,
                   child: FlatButton(
                     onPressed: () {
-                      print("111");
+                      selectTime(context, i, true);
                     },
                     child: Container(
-                      child: Text("8:00", style: TextStyle(color: SoftColors.blueDark, fontSize: 18)),
+                      child: Text(getTime(bells[i].begin), style: timeStyle),
                     ),
                   ),
                 ),
@@ -88,10 +169,10 @@ class EditBellsState extends State<EditBells>{
                   height: width/2,
                   child: FlatButton(
                     onPressed: () {
-                      selectTime(context, i);
+                      selectTime(context, i, false);
                     },
                     child: Container(
-                      child: Text("8:45", style: TextStyle(color: SoftColors.blueDark, fontSize: 18)),
+                      child: Text(getTime(bells[i].end), style: timeStyle),
                     ),
                   ),
                 )
@@ -101,12 +182,34 @@ class EditBellsState extends State<EditBells>{
         ),
     ));
 
+    ret.add(Container(
+        decoration: BoxDecoration(
+          boxShadow: UnpressedShadow.shadow,
+          color: SoftColors.blueLight,
+          borderRadius: BorderRadius.circular(30)
+        ),
+        margin: EdgeInsets.all(margin),
+        child: FlatButton(
+          child: Icon(Icons.add, color: SoftColors.blueDark, size: 30,),
+          onPressed: (){
+            Bell newBell = (bells.length>0) 
+            ? Bell(begin: bells[bells.length-1].end+10, end: bells[bells.length-1].end+55) 
+            : Bell(begin: 60*8, end: 60*8+45);
+            dbHelper.insertBell(newBell);
+            setState(() {
+            });
+          },
+        ),
+    ));
+
     return ret;
   }
 
   @override
   Widget build(BuildContext context) {
+    updateBellsList();
     return Scaffold(
+      key: _key,
       appBar: AppBar(
           centerTitle: true,
           //leading: Logo(),

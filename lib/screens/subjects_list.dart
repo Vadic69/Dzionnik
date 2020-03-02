@@ -26,54 +26,6 @@ class SubjectsListState extends State<SubjectsList> {
 
   SubjectsListState({this.subjectsList});
 
-  @override
-  Widget build(BuildContext context) {
-    if (subjectsList == null) {
-      subjectsList = List<Subject>();
-      updateListView();
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-          actions: <Widget>[
-            IconButton(
-              //onTap: navigateToAddScreen,
-              onPressed: (){
-                showAddSubject();
-              },
-              icon: Icon(Icons.add, color: SoftColors.blueDark, size: 30,),
-            ),
-          ],
-          centerTitle: true,
-          //leading: Logo(),
-          leading: Container(
-            child: SvgPicture.asset('assets/Dzlogo.svg'),
-            padding: EdgeInsets.all(10),
-          ),
-          title: Text(
-            "Предметы",
-            style: Styles.appBarTextStyle
-          ),
-          backgroundColor: SoftColors.blueLight,
-          elevation: 0,
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(0),
-            child: Container(
-              height: 1,
-              color: SoftColors.blueDark.withOpacity(0.5),
-              width: MediaQuery.of(context).size.width * 0.9,
-              //margin: EdgeInsets.only(bottom: 20),
-            ),
-          )),
-      body: Container(
-          decoration: BoxDecoration(color: SoftColors.blueLight),
-          child: ListView(
-            children: buildList(),
-          ),
-        ),
-    );
-  }
-
   void showAddSubject() {
     Subject addedSubject =
         Subject(id: 0, name: "NoName", marksKol: 0, averageMark: 0);
@@ -249,7 +201,7 @@ class SubjectsListState extends State<SubjectsList> {
                     height: 50.0,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Color(0xFF82DD96),
+                      color: SoftColors.green,
                     ),
                     child: Center(
                       child: Text(
@@ -296,5 +248,53 @@ class SubjectsListState extends State<SubjectsList> {
       ),
     ));
     return ret;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (subjectsList == null) {
+      subjectsList = List<Subject>();
+      updateListView();
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+          actions: <Widget>[
+            IconButton(
+              //onTap: navigateToAddScreen,
+              onPressed: (){
+                showAddSubject();
+              },
+              icon: Icon(Icons.add, color: SoftColors.blueDark, size: 30,),
+            ),
+          ],
+          centerTitle: true,
+          //leading: Logo(),
+          leading: Container(
+            child: SvgPicture.asset('assets/Dzlogo.svg'),
+            padding: EdgeInsets.all(10),
+          ),
+          title: Text(
+            "Предметы",
+            style: Styles.appBarTextStyle
+          ),
+          backgroundColor: SoftColors.blueLight,
+          elevation: 0,
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(0),
+            child: Container(
+              height: 1,
+              color: SoftColors.blueDark.withOpacity(0.5),
+              width: MediaQuery.of(context).size.width * 0.9,
+              //margin: EdgeInsets.only(bottom: 20),
+            ),
+          )),
+      body: Container(
+          decoration: BoxDecoration(color: SoftColors.blueLight),
+          child: ListView(
+            children: buildList(),
+          ),
+        ),
+    );
   }
 }

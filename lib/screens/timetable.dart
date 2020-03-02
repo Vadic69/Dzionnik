@@ -30,15 +30,15 @@ class TimetableState extends State<Timetable> {
   List<int> weekday;
   List<bool> selected;
   List<Bell> bells = [
-    Bell(begin: 495, end: 540, order: 1),
-    Bell(begin: 550, end: 595, order: 2),
-    Bell(begin: 610, end: 655, order: 3),
-    Bell(begin: 665, end: 710, order: 4),
-    Bell(begin: 725, end: 770, order: 5),
-    Bell(begin: 780, end: 825, order: 6),
-    Bell(begin: 835, end: 880, order: 7),
-    Bell(begin: 890, end: 935, order: 8),
-    Bell(begin: 945, end: 990, order: 9),
+    Bell(begin: 495, end: 540, id: 1),
+    Bell(begin: 550, end: 595, id: 2),
+    Bell(begin: 610, end: 655, id: 3),
+    Bell(begin: 665, end: 710, id: 4),
+    Bell(begin: 725, end: 770, id: 5),
+    Bell(begin: 780, end: 825, id: 6),
+    Bell(begin: 835, end: 880, id: 7),
+    Bell(begin: 890, end: 935, id: 8),
+    Bell(begin: 945, end: 990, id: 9),
   ];
   List<ScheduleItem> data;
 

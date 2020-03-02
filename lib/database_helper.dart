@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:school_diary/models/mark.dart';
 import 'package:school_diary/models/scheduleItem.dart';
 import 'package:sqflite/sqflite.dart';
+import 'models/bell.dart';
 import 'models/subject.dart';
 import 'models/mark.dart';
 
@@ -64,7 +65,7 @@ class DatabaseHelper{
     await db.execute('CREATE TABLE $tableName($id INTEGER PRIMARY KEY AUTOINCREMENT, $name TEXT, $averageScore FLOAT, $marksKol INTEGER)');
     await db.execute('CREATE TABLE $marks($markId INTEGER PRIMARY KEY AUTOINCREMENT, $value INTEGER, $subjectId INTEGER)');
     await db.execute('CREATE TABLE $scheduleitems($id INTEGER PRIMARY KEY AUTOINCREMENT, $weekday INTEGER, $name TEXT)');
-    await db.execute('CREATE TABLE $bells($order INTEGER, $begin INTEGER, $end INTEGER)');
+    await db.execute('CREATE TABLE $bells($id INTEGER PRIMARY KEY AUTOINCREMENT, $begin INTEGER, $end INTEGER)');
   }
 
   Future <List<Map<String,dynamic>>> getSubjectsMapList() async{
@@ -201,6 +202,41 @@ class DatabaseHelper{
 
   //Bells
 
+
+  Future <List<Map<String,dynamic>>> getBellsMapList() async{
+    Database db = await this.database;
+    var result = await db.rawQuery('SELECT * FROM $bells order by $id ASC');
+    return result;
+  }
+
+  Future<List<Bell>> getBells() async{
+    var MapList = await getBellsMapList();
+    int count = MapList.length;
+    List<Bell> list = List<Bell>();
+    for (int i=0; i<count; i++)
+      list.add(Bell.fromMap(MapList[i]));
+    return list;
+  }
+
+  Future<int> updateBell(Bell item) async
+  {
+    var db = await this.database;
+    var result = await db.update(bells, item.toMap(), where: '$id = ?',whereArgs: [item.id]);
+    return result;
+  }
+
+  Future <int> insertBell(Bell item) async {
+    Database db = await this.database;
+    var result = await db.insert(bells, item.toMap());
+    return result;
+  }
+
+  Future<int> deleteBell(int sid) async
+  {
+    var db = await this.database;
+    var result = await db.rawDelete('DELETE FROM $bells WHERE $order = $sid');
+    return result;
+  }
   
 
 }
