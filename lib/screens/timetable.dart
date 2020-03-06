@@ -425,6 +425,10 @@ class TimetableState extends State<Timetable> {
     });
   }
 
+  void updateBellsList() async {
+    bells = await DBhelper.getBells();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (number == null) {
@@ -435,6 +439,8 @@ class TimetableState extends State<Timetable> {
 
       buildDatesList();
     }
+
+    updateBellsList();
 
     if (data == null) {
       data = List<ScheduleItem>();

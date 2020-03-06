@@ -234,7 +234,7 @@ class DatabaseHelper{
   Future<int> deleteBell(int sid) async
   {
     var db = await this.database;
-    var result = await db.rawDelete('DELETE FROM $bells WHERE $order = $sid');
+    var result = await db.rawDelete('DELETE FROM $bells WHERE $id = $sid');
     return result;
   }
   

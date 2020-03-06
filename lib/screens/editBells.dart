@@ -37,6 +37,68 @@ class EditBellsState extends State<EditBells>{
     });
   }
 
+  void showDeleteDialog(BuildContext context, int id){
+    showModalBottomSheet(context: context, builder: (BuildContext buildContext){
+      return Container(
+        height: 220,
+        padding: EdgeInsets.all(15),
+        color: SoftColors.blueLight,
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 60,
+              alignment: Alignment(0,-1),
+              child: Icon(Icons.delete_outline, size: 50,),
+            ),
+            Text(
+              "Вы уверены, что желаете удалить урок из расписания?",
+              style: TextStyle(fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+            Container(
+                margin: EdgeInsets.only(top: 20),          
+                child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Container(
+                    width: 140,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: SoftColors.red, width: 2),  
+                      borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: FlatButton(
+                      onPressed: (){
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("Нет", style: TextStyle(color: SoftColors.red),),
+                    ),
+                  ),
+                  Container(
+                    width: 140,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: SoftColors.red,
+                      borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: FlatButton(
+                      onPressed: (){
+                        dbHelper.deleteBell(id);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("Да", style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  
+                ],
+              ),
+            )
+          ],
+        ),
+      );
+    });
+  }
+
   void updateBell(int order, int value, bool b){
     if (b) {
       if (order>0 && value<bells[order-1].end){
@@ -122,7 +184,7 @@ class EditBellsState extends State<EditBells>{
         decoration: BoxDecoration(
           boxShadow: UnpressedShadow.shadow,
           color: SoftColors.blueLight,
-          borderRadius: BorderRadius.circular(30)
+          borderRadius: BorderRadius.circular(30),
         ),
         margin: EdgeInsets.all(margin),
         child: Row(
@@ -131,13 +193,23 @@ class EditBellsState extends State<EditBells>{
             Container(
               width: width/2,
               height: width,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30))
+              ),
               alignment: Alignment(0.0,0.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text((i+1).toString(), style: TextStyle(fontSize: 30),),
-                  Text("Урок")
-                ],
+              child: FlatButton(
+                  splashColor: SoftColors.red.withOpacity(0.2),
+                  highlightColor: SoftColors.red.withOpacity(0.1),
+                  onPressed: (){
+                    showDeleteDialog(context, bells[i].id);
+                  },
+                  child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text((i+1).toString(), style: TextStyle(fontSize: 30),),
+                    Text("Урок")
+                  ],
+                ),
               ),
             ),
             Container(
@@ -148,9 +220,14 @@ class EditBellsState extends State<EditBells>{
             Column(
               children: <Widget>[
                 Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(30))
+                  ),
                   width: width/2,
                   height: width/2,
                   child: FlatButton(
+                    splashColor: SoftColors.blueDark.withOpacity(0.2),
+                    highlightColor: SoftColors.blueDark.withOpacity(0.1),
                     onPressed: () {
                       selectTime(context, i, true);
                     },
@@ -167,7 +244,12 @@ class EditBellsState extends State<EditBells>{
                 Container(
                   width: width/2,
                   height: width/2,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(bottomRight: Radius.circular(30))
+                  ),
                   child: FlatButton(
+                    splashColor: SoftColors.blueDark.withOpacity(0.2),
+                    highlightColor: SoftColors.blueDark.withOpacity(0.1),
                     onPressed: () {
                       selectTime(context, i, false);
                     },
