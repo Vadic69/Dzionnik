@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:school_diary/constants.dart';
-import 'package:school_diary/database_helper.dart';
 import 'package:school_diary/models/bell.dart';
+import 'package:school_diary/services/database_helper.dart';
 
 class EditBells extends StatefulWidget {
   @override
@@ -15,7 +15,6 @@ class EditBells extends StatefulWidget {
 }
 
 class EditBellsState extends State<EditBells>{
-
 
   DatabaseHelper dbHelper = DatabaseHelper();
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
@@ -33,7 +32,6 @@ class EditBellsState extends State<EditBells>{
   void updateBellsList() async {
     bells = await dbHelper.getBells();
     setState(() {
-
     });
   }
 

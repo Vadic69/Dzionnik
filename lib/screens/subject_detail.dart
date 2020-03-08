@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:school_diary/models/subject.dart';
 import 'package:school_diary/models/mark.dart';
 import 'package:school_diary/constants.dart';
+import 'package:school_diary/services/database_helper.dart';
 import 'package:school_diary/widgets/Mark_card.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-
-import '../database_helper.dart';
 
 class MarksList extends StatefulWidget {
   final Subject subject;

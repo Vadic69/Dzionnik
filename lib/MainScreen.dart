@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:school_diary/screens/login.dart';
+import 'package:school_diary/screens/marks_trading_control.dart';
+import 'package:school_diary/screens/settings.dart';
 import 'package:school_diary/screens/timetable.dart';
 import 'package:school_diary/screens/subjects_list.dart';
 import 'package:school_diary/constants.dart';
@@ -13,12 +16,9 @@ class MainScreen extends StatefulWidget {
 
 List<Widget> screens = [
   SubjectsList(),
-  Timetable()
-];
-
-List<String> AppBarNames = [
-  "Предметы",
-  "Расписание"
+  Timetable(),
+  MarksTradingControl(),
+  SettingsPage()
 ];
 
 int currentPage = 1;
@@ -49,6 +49,7 @@ class MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       bottomNavigationBar: BottomAppBar(
         color: SoftColors.blueLight,
         elevation: 0,
@@ -58,6 +59,8 @@ class MainScreenState extends State<MainScreen> {
             children: <Widget>[
               BottomItem(Text('7,3', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: SoftColors.blueDark),), 0),
               BottomItem(Icon(Icons.timer, color: SoftColors.blueDark,), 1),
+              BottomItem(Icon(Icons.compare_arrows, color: SoftColors.blueDark,), 2),
+              BottomItem(Icon(Icons.settings, color: SoftColors.blueDark,), 3),
             ],
           ),
           height: 80,

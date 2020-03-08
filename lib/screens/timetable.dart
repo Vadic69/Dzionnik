@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:school_diary/constants.dart';
-import 'package:school_diary/database_helper.dart';
 import 'package:school_diary/models/bell.dart';
 import 'package:school_diary/models/scheduleItem.dart';
 import 'package:school_diary/screens/editBells.dart';
+import 'package:school_diary/services/database_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Timetable extends StatefulWidget {
@@ -29,17 +29,7 @@ class TimetableState extends State<Timetable> {
   List<bool> active;
   List<int> weekday;
   List<bool> selected;
-  List<Bell> bells = [
-    Bell(begin: 495, end: 540, id: 1),
-    Bell(begin: 550, end: 595, id: 2),
-    Bell(begin: 610, end: 655, id: 3),
-    Bell(begin: 665, end: 710, id: 4),
-    Bell(begin: 725, end: 770, id: 5),
-    Bell(begin: 780, end: 825, id: 6),
-    Bell(begin: 835, end: 880, id: 7),
-    Bell(begin: 890, end: 935, id: 8),
-    Bell(begin: 945, end: 990, id: 9),
-  ];
+  List<Bell> bells;
   List<ScheduleItem> data;
 
   void addToDB(ScheduleItem item) async {
@@ -351,7 +341,7 @@ class TimetableState extends State<Timetable> {
                 },
                 child: ListTile(
                     title: Text(data[i].name),
-                    subtitle: Text(getTime(bells[j].begin, bells[j].end)),
+                    subtitle: (j<bells.length) ? Text(getTime(bells[j].begin, bells[j].end)) : Text("Звонок не найден"),
                     leading: ((j >= lesson - 1 &&
                                 data[i].weekday == DateTime.now().weekday) ||
                             data[i].weekday > DateTime.now().weekday ||
@@ -436,6 +426,7 @@ class TimetableState extends State<Timetable> {
       weekday = List<int>();
       active = List<bool>();
       selected = List<bool>();
+      bells = List<Bell>();
 
       buildDatesList();
     }

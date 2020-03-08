@@ -1,14 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-
-//import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:school_diary/models/bell.dart';
 import 'package:school_diary/models/mark.dart';
 import 'package:school_diary/models/scheduleItem.dart';
+import 'package:school_diary/models/subject.dart';
 import 'package:sqflite/sqflite.dart';
-import 'models/bell.dart';
-import 'models/subject.dart';
-import 'models/mark.dart';
 
 
 class DatabaseHelper{
