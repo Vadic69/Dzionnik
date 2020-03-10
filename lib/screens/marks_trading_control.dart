@@ -13,6 +13,8 @@ class  MarksTradingControl extends StatelessWidget {
     return StreamBuilder(
       stream: FirebaseAuth.instance.onAuthStateChanged,
       builder: (context, AsyncSnapshot<FirebaseUser> snapshot){
+        if (!snapshot.hasData)
+          return SplashScreen();
         if (snapshot.data == null)
           return LoginPage();
         return MarksTrading();
