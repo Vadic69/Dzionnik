@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -166,7 +164,7 @@ class EditBellsState extends State<EditBells>{
 
   List<Widget> buildList(){
 
-    double margin, width, height, screenWidth;
+    double margin, width, screenWidth;
     screenWidth = MediaQuery.of(context).size.width;
     margin = 20;
     width = ((screenWidth-4*margin)/2)-1;

@@ -259,6 +259,7 @@ class TimetableState extends State<Timetable> {
     if (mon == 10) return "Октябрь";
     if (mon == 11) return "Ноябрь";
     if (mon == 12) return "Декабрь";
+    return "ERROR";
   }
 
   List<Widget> buildDates() {

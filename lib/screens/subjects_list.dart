@@ -176,71 +176,20 @@ class SubjectsListState extends State<SubjectsList> {
   }
 
   List<Widget> buildList() {
-
-    List<Widget> ret = subjectsList
-        .map((Subject x) => GestureDetector(
-            onLongPress: () {
-              showDeleteDialog(x);
-            },
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MarksList(x)));
-            },
-            child: AnimatedContainer(
-              duration: Duration(seconds: 1),
-              curve: Curves.ease,
-              padding: EdgeInsets.only(top: 7.0, bottom: 7.0),
-              margin: EdgeInsets.only(left: 14.0, right: 14.0, top: 20.0),
-              decoration: BoxDecoration(
-                  color: SoftColors.blueLight,
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  boxShadow: UnpressedShadow.shadow),
-              child: ListTile(
-                  leading: Container(
-                    width: 45.0,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: SoftColors.green,
-                    ),
-                    child: Center(
-                      child: Text(
-                        x.averageMark.toString(),
-                        style: TextStyle(
-                            //fontWeight: FontWeight.bold,
-                            color: Color(0xFFFFFFFF),
-                            fontSize: 20.0),
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    x.name,
-                    style: TextStyle(fontSize: 18.0),
-                  ),
-                  trailing: Container(
-                      width: 45,
-                      height: 45,
-                      child: Center(
-                        child: ListView(
-                          children: <Widget>[
-                            Text(
-                              x.marksKol.toString(),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 25,
-                                //fontWeight: FontWeight.w600
-                              ),
-                            ),
-                            Text(
-                              getSubjString(x.marksKol),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 8),
-                            )
-                          ],
-                        ),
-                      ))),
-            )))
-        .toList();
+    List<Widget> ret = List<Widget>();
+    for (Subject x in subjectsList)
+      ret.add(SoftListTile(
+        leading: x.averageMark.toString(),
+        title: x.name,
+        //subtitle: "",
+        onTap: (){
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) => MarksList(x)));
+        },
+        onLongPress: (){
+          showDeleteDialog(x);
+        },
+      ));
     ret.add(GestureDetector(
       child: Container(
         margin: EdgeInsets.only(top: 50),

@@ -4,7 +4,6 @@ import 'package:school_diary/constants.dart';
 class ClassroomPage extends StatefulWidget{
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return ClassroomPageState();
   }
 }

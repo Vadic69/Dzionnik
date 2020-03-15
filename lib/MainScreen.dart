@@ -59,6 +59,22 @@ class MainScreenState extends State<MainScreen> {
             children: <Widget>[
               BottomItem(Text('7,3', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: SoftColors.blueDark),), 0),
               BottomItem(Icon(Icons.timer, color: SoftColors.blueDark,), 1),
+              GestureDetector(
+                onTap: (){
+                  setState((){});
+                },
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                      //color: SoftColors.blueLight,
+                      color: SoftColors.blueLight,
+                      boxShadow: UnpressedShadow.shadow,
+                      borderRadius: BorderRadius.all(Radius.circular(20))
+                  ),
+                  child: Center(child: Icon(Icons.add, color: SoftColors.blueDark,),)
+                ),
+              ),
               BottomItem(Icon(Icons.compare_arrows, color: SoftColors.blueDark,), 2),
               BottomItem(Icon(Icons.settings, color: SoftColors.blueDark,), 3),
             ],

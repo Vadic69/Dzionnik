@@ -76,6 +76,7 @@ class LoginPageState extends State<LoginPage> {
                   ),
                   onTap: () async {
                     bool res = await AuthService().signInWithEmail(_emailController.text, _passwordController.text);
+                    print(res);
                   },
                   child: Center(child: Text(
                     "Войти",
