@@ -64,6 +64,7 @@ class UnknownHometaskPageState extends State<UnknownHometaskPage>{
   void dispose(){
     onHometaskAddedSubscription.cancel();
     onHometaskDeletedSubscription.cancel();
+    onHometaskUpdatedSubscription.cancel();
     super.dispose();
   }
 

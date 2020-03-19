@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:school_diary/screens/login.dart';
+import 'package:school_diary/screens/login_or_register.dart';
 import 'package:school_diary/screens/marks_trading_control.dart';
+import 'package:school_diary/screens/register.dart';
 import 'package:school_diary/screens/settings.dart';
 import 'package:school_diary/screens/timetable.dart';
 import 'package:school_diary/screens/subjects_list.dart';
@@ -80,7 +82,7 @@ class MainScreenState extends State<MainScreen> {
             ],
           ),
           height: 80,
-          decoration: BoxDecoration(
+          /*decoration: BoxDecoration(
               color: SoftColors.blueLight,
               boxShadow: [
                 BoxShadow(
@@ -90,7 +92,7 @@ class MainScreenState extends State<MainScreen> {
                     blurRadius: 10
                 )
               ]
-          ),
+          ),*/
         ),
       ),
       body: screens[currentPage],

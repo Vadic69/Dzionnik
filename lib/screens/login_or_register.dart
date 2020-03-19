@@ -1,69 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:school_diary/constants.dart';
+import 'package:school_diary/screens/login.dart';
 import 'package:school_diary/screens/register.dart';
-import 'package:school_diary/services/auth_service.dart';
 
-import '../constants.dart';
-
-
-class LoginPage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return LoginPageState();
-  }
-}
-
-class LoginPageState extends State<LoginPage> {
+class LoginOrRegisterPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
-    TextEditingController _emailController = TextEditingController(text: "");
-    TextEditingController _passwordController = TextEditingController(text: "");
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
       body: Container(
+        width: double.infinity,
         color: SoftColors.blueLight,
-        alignment: Alignment(0,0),
-        padding: EdgeInsets.all(50),
-        child: Column(
-          children: <Widget>[
-            SizedBox(height: 160,),
-            Text(
-              "Авторизация",
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-            ),
-            SizedBox(height: 30),
-            Container(
-              child: TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  hintText: "E-mail",
-                ),
-              ),
-              padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: UnpressedShadow.shadow
-              ),
-            ),
-            SizedBox(height: 20,),
-            Container(
-              child: TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  hintText: "Пароль",
-                ),
-              ),
-              padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: UnpressedShadow.shadow
-              ),
-            ),
-
-            SizedBox(height: 20,),
-            Container(
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SvgPicture.asset('assets/Dzlogo.svg', height: 100,),
+              SizedBox(height: 30,),
+              Text("Упс... Вы не авторизованы", style: TextStyle(fontSize: 24), textAlign: TextAlign.center,),
+              SizedBox(height: 30,),
+              Container(
               width: 300,
               height: 60,
               decoration: BoxDecoration(
@@ -77,10 +33,8 @@ class LoginPageState extends State<LoginPage> {
                     customBorder: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                     ),
-                    onTap: () async {
-                      bool res = await AuthService().signInWithEmail(_emailController.text, _passwordController.text);
-                      print(res);
-                      Navigator.of(context).pop();
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
                     },
                     child: Center(child: Text(
                       "Войти",
@@ -124,7 +78,8 @@ class LoginPageState extends State<LoginPage> {
                 ),
               ),
             )
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -1,8 +1,11 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:school_diary/models/user.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final Firestore _firestore = Firestore.instance;
 
   Future<bool> signInWithEmail(String email, String password) async {
     try {
@@ -25,5 +28,23 @@ class AuthService {
 
   Future<void> logOut() async {
     await _auth.signOut();
+  }
+
+  Future<String> createUser(User newUser) async {
+    AuthResult createRes;
+    try {
+      createRes = await _auth.createUserWithEmailAndPassword(email: newUser.email, password: newUser.password);
+      FirebaseUser resUser = createRes.user;
+      if (resUser != null){
+        Firestore.instance
+        .collection("users")
+        .document(resUser.uid)
+        .setData(newUser.toJson());
+      }  
+    } catch (e) {
+      //print(e);
+      return e.message;
+    }
+    
   }
 }
