@@ -106,16 +106,8 @@ class SubjectsListState extends State<SubjectsList> {
     Navigator.pop(context, true);
   }
 
-  void updateListView() {
-    final Future<Database> dbFuture = databaseHelper.inicializeDatabase();
-    dbFuture.then((database) {
-      Future<List<Subject>> subjListFuture = databaseHelper.getSubjectsList();
-      subjListFuture.then((subjList) {
-        setState(() {
-          this.subjectsList = subjList;
-        });
-      });
-    });
+  void updateListView() async {
+    subjectsList = await databaseHelper.getSubjectsList();
   }
 
   String getSubjString(int kol) {

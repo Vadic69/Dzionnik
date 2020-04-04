@@ -114,4 +114,49 @@ class SoftListTile extends StatelessWidget{
 
 }
 
+class CustomButton extends StatelessWidget{
+  Color color, splashColor, shadowColor;
+  double width, height;
+  Widget child;
+  Function onTap;
+
+  CustomButton({this.color, this.splashColor, this.child, this.onTap, this.shadowColor, this.height, this.width});
+
+  @override
+  Widget build(BuildContext context) {
+  return Material(
+    color: color,
+    borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        customBorder: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20)
+        ),
+        child: Container(
+          child: child,
+          width: width,
+          height: height,
+          alignment: Alignment(0,0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: SoftColors.red,
+            boxShadow: [
+              BoxShadow(
+                color: shadowColor,
+                blurRadius: 6,
+                offset: Offset(0, 4),
+              ),
+              BoxShadow(
+                color: Color(0xFFFFFFFF),
+                blurRadius: 15,
+                offset: Offset(-5, -5),
+              )
+            ]
+          )),
+          onTap: onTap
+      ),
+  );
+  }
+
+}
+
 

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:school_diary/screens/login.dart';
-import 'package:school_diary/screens/login_or_register.dart';
-import 'package:school_diary/screens/marks_trading_control.dart';
-import 'package:school_diary/screens/register.dart';
+import 'package:school_diary/functions.dart';
+import 'package:school_diary/screens/books.dart';
+import 'package:school_diary/screens/notifications.dart';
 import 'package:school_diary/screens/settings.dart';
 import 'package:school_diary/screens/timetable.dart';
 import 'package:school_diary/screens/subjects_list.dart';
@@ -19,8 +18,9 @@ class MainScreen extends StatefulWidget {
 List<Widget> screens = [
   SubjectsList(),
   Timetable(),
-  MarksTradingControl(),
-  SettingsPage()
+  Books(),
+  Notifications(),
+  SettingsPage(),
 ];
 
 int currentPage = 1;
@@ -61,24 +61,9 @@ class MainScreenState extends State<MainScreen> {
             children: <Widget>[
               BottomItem(Text('7,3', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: SoftColors.blueDark),), 0),
               BottomItem(Icon(Icons.timer, color: SoftColors.blueDark,), 1),
-              GestureDetector(
-                onTap: (){
-                  setState((){});
-                },
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                      //color: SoftColors.blueLight,
-                      color: SoftColors.blueLight,
-                      boxShadow: UnpressedShadow.shadow,
-                      borderRadius: BorderRadius.all(Radius.circular(20))
-                  ),
-                  child: Center(child: Icon(Icons.add, color: SoftColors.blueDark,),)
-                ),
-              ),
-              BottomItem(Icon(Icons.compare_arrows, color: SoftColors.blueDark,), 2),
-              BottomItem(Icon(Icons.settings, color: SoftColors.blueDark,), 3),
+              BottomItem(Icon(Icons.book, color: SoftColors.blueDark,), 2),
+              BottomItem(Icon(Icons.schedule, color: SoftColors.blueDark,), 3),
+              BottomItem(Icon(Icons.settings, color: SoftColors.blueDark,), 4),
             ],
           ),
           height: 80,

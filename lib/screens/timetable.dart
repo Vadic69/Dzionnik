@@ -32,6 +32,16 @@ class TimetableState extends State<Timetable> {
   List<Bell> bells;
   List<ScheduleItem> data;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  navigateToEditBells(BuildContext context) async {
+    final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => EditBells()));
+    updateList();
+  }
+
   void addToDB(ScheduleItem item) async {
     int res = await DBhelper.insertScheduleItem(item);
     if (res != 0) {
@@ -445,10 +455,8 @@ class TimetableState extends State<Timetable> {
       appBar: AppBar(
           actions: <Widget>[
             IconButton(
-              //onTap: navigateToAddScreen,
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => EditBells()));
+                navigateToEditBells(context);
               },
               icon: Icon(
                 Icons.alarm,
