@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:school_diary/models/bell.dart';
+import 'package:school_diary/models/book.dart';
 import 'package:school_diary/models/mark.dart';
 import 'package:school_diary/models/scheduleItem.dart';
 import 'package:school_diary/models/subject.dart';
@@ -30,6 +31,13 @@ class DatabaseHelper{
   String begin = 'begin';
   String end = 'end';
   String bells = 'bells';
+
+  String fileName = "fileName";
+  String author = "author";
+  String language = "language";
+  String form = "form";
+  String books = "books";
+  String subject = "subject";
 
 
   DatabaseHelper._createInstance();
@@ -63,6 +71,7 @@ class DatabaseHelper{
     await db.execute('CREATE TABLE $marks($markId INTEGER PRIMARY KEY AUTOINCREMENT, $value INTEGER, $subjectId INTEGER)');
     await db.execute('CREATE TABLE $scheduleitems($id INTEGER PRIMARY KEY AUTOINCREMENT, $weekday INTEGER, $name TEXT)');
     await db.execute('CREATE TABLE $bells($id INTEGER PRIMARY KEY AUTOINCREMENT, $begin INTEGER, $end INTEGER)');
+    await db.execute('CREATE TABLE $books($id TEXT, $form INTEGER, $fileName TEXT, $author TEXT, $language INTEGER, $subject TEXT)');
   }
 
   Future <List<Map<String,dynamic>>> getSubjectsMapList() async{
@@ -233,6 +242,36 @@ class DatabaseHelper{
     var db = await this.database;
     var result = await db.rawDelete('DELETE FROM $bells WHERE $id = $sid');
     return result;
+  }
+
+  // helper for books
+
+  Future <List<Map<String,dynamic>>> getBooksMapList() async{
+    Database db = await this.database;
+    var result = await db.rawQuery('SELECT * FROM $books');
+    return result;
+  }
+
+  Future <int> insertBook(Book book) async {
+    Database db = await this.database;
+    var result = await db.insert(books, book.toMap());
+    return result;
+  }
+
+  Future<int> deleteBook(int rId) async
+  {
+    var db = await this.database;
+    var result = await db.rawDelete('DELETE FROM $books WHERE $id = $rId');
+    return result;
+  }
+
+  Future<List<Book>> getBooksList() async {
+    var bookMapList = await getBooksMapList();
+    int count = bookMapList.length;
+    List<Book> list = List<Book>();
+    for (int i=0; i<count; i++)
+      list.add(Book.fromMap(bookMapList[i]));
+    return list;
   }
   
 

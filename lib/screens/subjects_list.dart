@@ -6,6 +6,7 @@ import 'package:school_diary/constants.dart';
 import 'package:school_diary/models/subject.dart';
 import 'package:school_diary/screens/subject_detail.dart';
 import 'package:school_diary/services/database_helper.dart';
+import 'package:school_diary/widgets/soft_listTile.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_svg/flutter_svg.dart';
