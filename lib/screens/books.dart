@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:school_diary/screens/download_book.dart';
 import 'package:school_diary/screens/view_pdf.dart';
 import 'package:school_diary/services/database_helper.dart';
+import 'package:school_diary/widgets/soft_button.dart';
 import 'package:school_diary/widgets/soft_listTile.dart';
 
 class Books extends StatefulWidget{
@@ -22,6 +23,7 @@ class BooksState extends State<Books>{
 
   List<Book> data = List<Book>();
   PDFDocument document;
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
   updateBooksList() async {
     data = await DatabaseHelper().getBooksList();
@@ -43,6 +45,11 @@ class BooksState extends State<Books>{
         leading: data[i].form.toString(),
         title: data[i].subject,
         subtitle: data[i].author,
+        onLongPress: (){
+          showDeleteBottomSheet(data[i]);
+          setState(() {
+          });
+        },
         onTap: (){
           getDocument(data[i].fileName);
         },
@@ -57,7 +64,6 @@ class BooksState extends State<Books>{
     var dir = await getApplicationDocumentsDirectory();
     File file = File("${dir.path}/books/$fileName");
     bool b = await file.exists();
-    print(b);
     if (!b) return;
     document = await PDFDocument.fromFile(file);
     Navigator.push(
@@ -66,6 +72,80 @@ class BooksState extends State<Books>{
         builder: (context) => ViewPdf(document: document)
       )
     );
+  }
+
+  deleteBook(Book book) async {
+    
+    var dir = await getApplicationDocumentsDirectory();
+    String path = "${dir.path}/books/${book.fileName}";
+    File file = File(path);
+    if (await file.exists())
+      file.delete();
+
+    await DatabaseHelper().deleteBook(book.id);
+
+    data.removeWhere((item) => item==book);
+  }
+
+  showDeleteBottomSheet(Book book){
+    double screenWidth = MediaQuery.of(context).size.width;
+    double margin = 14;
+    double buttonWidth = (screenWidth - 3*margin)/2;
+    showModalBottomSheet(context: context, builder: (BuildContext buildContext){
+      return Container(
+        height: 230,
+        padding: EdgeInsets.all(15),
+        color: SoftColors.blueLight,
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 60,
+              alignment: Alignment(0,-1),
+              child: Icon(Icons.delete_outline, size: 50,),
+            ),
+            Text(
+              book.subject,
+              style: TextStyle(fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 10,),
+            Text("Вы уверены, что хотите удалить учебник из памяти устройства?", textAlign: TextAlign.center,),
+            SizedBox(height: 20,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                SoftButton(
+                  child: Text("Отмена"),
+                  height: 50,
+                  width: buttonWidth,
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                ),
+                SoftButton(
+                  color: SoftColors.red,
+                  child: Text("Удалить", style: TextStyle(color: Colors.white),),
+                  height: 50,
+                  width: buttonWidth,
+                  onTap: () async {
+                    await deleteBook(book);
+                    Navigator.of(context).pop();
+                    scaffoldKey.currentState.showSnackBar(SnackBar(
+                      content: Text("Учебник удалён"),
+                      backgroundColor: SoftColors.green,
+                    ));
+                    updateBooksList();
+                    setState(() {
+                    });
+                  },
+                )
+              ],
+            )
+            
+          ],
+        ),
+      );
+    });
   }
 
   onStart() async {
@@ -78,6 +158,7 @@ class BooksState extends State<Books>{
   Widget build(BuildContext context) {
     onStart();
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         actions: <Widget>[
           IconButton(
@@ -116,9 +197,37 @@ class BooksState extends State<Books>{
           )),
       body: Container(
         color: SoftColors.blueLight,
-        child: ListView(
+        child: (data.length!=0) 
+        ? ListView(
           children: buildList(),
-        ),
+        )
+        : Container(
+            alignment: Alignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Text("У Вас пока нет скачанных учебников", style: TextStyle(color: SoftColors.blueDark),),
+                SizedBox(height: 14,),
+                SoftButton(
+                  child: Icon(Icons.arrow_downward, color: SoftColors.blueDark,),
+                  color: SoftColors.blueLight,
+                  height: 60,
+                  width: 60,
+                  onTap: () async {
+                    var dir = await getApplicationDocumentsDirectory();
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(builder: (BuildContext context) => DownloadBooks(dir: dir.path, local: data,))
+                    );
+                    await updateBooksList();
+                    setState(() {
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
       ),
     );
   }

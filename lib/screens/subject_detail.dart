@@ -4,9 +4,9 @@ import 'package:school_diary/models/subject.dart';
 import 'package:school_diary/models/mark.dart';
 import 'package:school_diary/constants.dart';
 import 'package:school_diary/services/database_helper.dart';
-import 'package:school_diary/widgets/Mark_card.dart';
+import 'package:school_diary/widgets/delete_modal_bottom_sheet.dart';
+import 'package:school_diary/widgets/soft_button.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 
 class MarksList extends StatefulWidget {
   final Subject subject;
@@ -20,12 +20,13 @@ class MarksList extends StatefulWidget {
 }
 
 class MarksListState extends State<MarksList> {
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   List<Mark> marksList;
   Subject subject;
 
   MarksListState(this.subject);
 
-  Mark selectedMark = Mark(value: 5);
+  Mark selectedMark = Mark(value: 10);
 
   DatabaseHelper databaseHelper = DatabaseHelper();
 
@@ -35,9 +36,7 @@ class MarksListState extends State<MarksList> {
     if (result != 0) {
       subject.marksKol++;
       updateSubject();
-      //print("Success!");
     } else {
-      //print("ERROR!");
     }
     Navigator.pop(context, true);
   }
@@ -52,7 +51,6 @@ class MarksListState extends State<MarksList> {
     } else {
       subject.averageMark = 0.0;
     }
-    //print(subject.averageMark);
     databaseHelper.updateSubject(subject);
   }
 
@@ -68,135 +66,103 @@ class MarksListState extends State<MarksList> {
     });
   }
 
-  void showAddDialog() {
-    Alert(
-        style: SoftStyles.alertStyle,
-        title: subject.name,
-        desc: "Добавить отметку",
-        context: context,
-        content: Column(
-          children: <Widget>[
-            Container(
-                child: Icon(Icons.arrow_drop_up),
-                margin: EdgeInsets.only(top: 20)),
-            Container(
-              height: 70,
-              width: 80,
-              child: PageView(
-                children: <Widget>[
-                  MarkCard(value: "1", fontSize: 40),
-                  MarkCard(value: "2", fontSize: 40),
-                  MarkCard(value: "3", fontSize: 40),
-                  MarkCard(value: "4", fontSize: 40),
-                  MarkCard(value: "5", fontSize: 40),
-                  MarkCard(value: "6", fontSize: 40),
-                  MarkCard(value: "7", fontSize: 40),
-                  MarkCard(value: "8", fontSize: 40),
-                  MarkCard(value: "9", fontSize: 40),
-                  MarkCard(value: "10", fontSize: 40),
-                ],
-                onPageChanged: (index) {
-                  selectedMark.value = index + 1;
-                  //print(selectedMark.value);
-                },
-                scrollDirection: Axis.vertical,
-              ),
-            ),
-            Container(
-              child: Icon(Icons.arrow_drop_down),
-              margin: EdgeInsets.only(bottom: 20),
-            ),
-            Container(
-                margin: EdgeInsets.only(bottom: 15, top: 15),
-                decoration: BoxDecoration(boxShadow: UnpressedShadow.shadow),
-                child: DialogButton(
-                  height: 45,
-                  child: Text("Добавить",
-                      style:
-                          TextStyle(color: SoftColors.blueLight, fontSize: 20)),
-                  radius: BorderRadius.circular(15),
-                  color: SoftColors.blueDark,
-                  //textColor: Colors.white,
-                  onPressed: () {
-                    saveData();
-                    //Navigator.of(context).pop();
-                    updateMarksList();
-                  },
-                )),
-            Container(
-              decoration: BoxDecoration(boxShadow: UnpressedShadow.shadow),
-              child: DialogButton(
-                height: 45,
-                child: Text("Отмена",
-                    style: TextStyle(color: SoftColors.blueDark, fontSize: 20)),
-                radius: BorderRadius.circular(15),
-                color: SoftColors.blueLight,
-                //textColor: Custom_Colors.blue,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
-          ],
-        ),
-        buttons: []).show();
+  List<Widget> buildRow(int l, int r){
+    double screenWidth = MediaQuery.of(context).size.width;
+    double margin = 14;
+    double kol = (r-l+1)+0.0;
+    double buttonWidth = (screenWidth-margin*(kol+1))/kol;
+    List<Widget> ret = List<Widget>();
+    for (int i=l; i<=r; i++){
+      ret.add(SoftButton(
+        child: Text(
+          i.toString(),
+          style: TextStyle(
+            color: SoftColors.blueDark,
+            fontSize: 22,
+            )
+          ),
+        height: buttonWidth,
+        width: buttonWidth,
+        onTap: (){
+          selectedMark.value = i;
+          saveData();
+          updateMarksList();
+        },
+      )
+    );
+    }
+
+    return ret;
   }
 
-  void showDeleteDialog(Mark delMark) {
-    Alert(
-        style: AlertStyle(
-          animationType: AnimationType.fromLeft,
-          backgroundColor: SoftColors.blueLight,
-          titleStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-          isCloseButton: false,
-        ),
-        context: context,
-        title: subject.name + ": " + delMark.value.toString(),
-        desc: "Желаете удалить выбранную отметку?",
-        content: Column(
+  showAddBottomSheet(){
+    double screenWidth = MediaQuery.of(context).size.width;
+    double margin = 14;
+    double kol = 5;
+    double buttonWidth = (screenWidth-margin*(kol+1))/kol;
+    showModalBottomSheet(context: context, builder: (context){
+      return Container(
+      height: margin*4+buttonWidth*2+44,
+        padding: EdgeInsets.all(14),
+        child: Column(
           children: <Widget>[
-            Container(
-                margin: EdgeInsets.only(bottom: 15, top: 25),
-                decoration: BoxDecoration(boxShadow: UnpressedShadow.shadow),
-                child: DialogButton(
-                  height: 40,
-                  child: Text("Удалить",
-                      style:
-                          TextStyle(color: SoftColors.blueLight, fontSize: 20)),
-                  radius: BorderRadius.circular(15),
-                  color: SoftColors.blueDark,
-                  //textColor: Colors.white,
-                  onPressed: () {
-                    databaseHelper.deleteMark(delMark.markId);
-                    subject.marksKol--;
-                    updateSubject();
-                    Navigator.of(context).pop();
-                    updateMarksList();
-                  },
-                )),
-            Container(
-              decoration: BoxDecoration(boxShadow: UnpressedShadow.shadow),
-              child: DialogButton(
-                height: 40,
-                child: Text("Отмена",
-                    style: TextStyle(color: SoftColors.blueDark, fontSize: 20)),
-                radius: BorderRadius.circular(15),
-                color: SoftColors.blueLight,
-                //textColor: Custom_Colors.blue,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+            Text(
+              "Добавить отметку",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold
               ),
             ),
+            SizedBox(height: 20,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: buildRow(1,5),
+            ),
+            SizedBox(height: 14, width: double.infinity,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: buildRow(6,10),
+            ),
+            SizedBox(height: 14, width: double.infinity,),
           ],
         ),
-        buttons: []).show();
+      );
+    });
   }
+
+  showDeleteMarksBottomSheet(Mark delMark){
+    double screenWidth = MediaQuery.of(context).size.width;
+    double margin = 14;
+    double buttonWidth = (screenWidth - 3*margin)/2;
+    showModalBottomSheet(context: context, builder: (context){
+      return DeleteModalBottomSheet(
+        buttonWidth: buttonWidth,
+        text: "Вы действительно хотите удалить отметку? (${delMark.value})",
+        onTap: () async {
+          int res = await databaseHelper.deleteMark(delMark.markId);
+          subject.marksKol--;
+          updateSubject();
+          Navigator.of(context).pop();
+          updateMarksList();
+          scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: (res==1) ? Text("Отметка была успешно удалена") : Text("Ошибка"),
+            backgroundColor: (res==1) ? SoftColors.green : SoftColors.red,
+          ));
+        },
+      );
+    });
+  }
+
+  @override
+  void initState(){
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     selectedMark.subjectId = subject.id;
-    selectedMark.value = 1;
+    selectedMark.value = 10;
 
     if (marksList == null) {
       marksList = List<Mark>();
@@ -204,6 +170,7 @@ class MarksListState extends State<MarksList> {
     }
 
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
           centerTitle: true,
           //leading: Logo(),
@@ -242,13 +209,13 @@ class MarksListState extends State<MarksList> {
     ret = marksList
         .map((Mark x) => GestureDetector(
             onTap: () {
-              showDeleteDialog(x);
+              showDeleteMarksBottomSheet(x);
             },
             child: Container(
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     //color: Color(getColor(x.value)),
-                    color: Color(0xFF82DD96),
+                    color: SoftColors.green,
                     boxShadow: UnpressedShadow.shadow),
                 child: Center(
                   child: Text(
@@ -256,7 +223,7 @@ class MarksListState extends State<MarksList> {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 26,
-                      fontWeight: FontWeight.w600,
+                      //fontWeight: FontWeight.w600,
                     ),
                   ),
                 ))))
@@ -264,7 +231,7 @@ class MarksListState extends State<MarksList> {
 
     ret.add(GestureDetector(
       //onTap: navigateToAddScreen,
-      onTap: showAddDialog,
+      onTap: showAddBottomSheet,
       child: Container(
         child: Icon(
           Icons.add,

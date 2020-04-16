@@ -6,8 +6,9 @@ import 'package:school_diary/constants.dart';
 import 'package:school_diary/models/subject.dart';
 import 'package:school_diary/screens/subject_detail.dart';
 import 'package:school_diary/services/database_helper.dart';
+import 'package:school_diary/widgets/delete_modal_bottom_sheet.dart';
+import 'package:school_diary/widgets/soft_button.dart';
 import 'package:school_diary/widgets/soft_listTile.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -20,6 +21,7 @@ class SubjectsList extends StatefulWidget {
 }
 
 class SubjectsListState extends State<SubjectsList> {
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Subject> subjectsList;
   int count = 0;
@@ -98,17 +100,13 @@ class SubjectsListState extends State<SubjectsList> {
   void saveData(Subject addedSubject) async {
     int result;
     result = await databaseHelper.insertSubject(addedSubject);
-    if (result != 0) {
-      //print("Success!");
-      //print(addedSubject.name);
-    } else {
-      //print("ERROR!");
-    }
     Navigator.pop(context, true);
   }
 
   void updateListView() async {
     subjectsList = await databaseHelper.getSubjectsList();
+    setState(() {
+    });
   }
 
   String getSubjString(int kol) {
@@ -116,56 +114,6 @@ class SubjectsListState extends State<SubjectsList> {
     if (kol % 10 >= 2 && kol % 10 <= 4 && (kol < 10 || kol > 19))
       return "Отметки";
     return "Отметок";
-  }
-
-  void showDeleteDialog(Subject delSubj) {
-    Alert(
-        style: AlertStyle(
-          animationType: AnimationType.fromLeft,
-          backgroundColor: SoftColors.blueLight,
-          titleStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-          isCloseButton: false,
-        ),
-        context: context,
-        title: delSubj.name,
-        desc: "Желаете удалить выбранный предмет? Все отметки также удалятся, отменить действие будет невозможно.",
-        content: Column(
-          children: <Widget>[
-            Container(
-                margin: EdgeInsets.only(bottom: 15, top: 25),
-                decoration: BoxDecoration(boxShadow: UnpressedShadow.shadow),
-                child: DialogButton(
-                  height: 45,
-                  child: Text("Удалить",
-                      style:
-                          TextStyle(color: SoftColors.blueLight, fontSize: 20)),
-                  radius: BorderRadius.circular(15),
-                  color: SoftColors.red.withOpacity(0.8),
-                  //textColor: Colors.white,
-                  onPressed: () {
-                    databaseHelper.deleteSubject(delSubj.id);
-                    databaseHelper.deleteMarks(delSubj.id);
-                    Navigator.of(context).pop();
-                    updateListView();
-                  },
-                )),
-            Container(
-              decoration: BoxDecoration(boxShadow: UnpressedShadow.shadow),
-              child: DialogButton(
-                height: 45,
-                child: Text("Отмена",
-                    style: TextStyle(color: Colors.black, fontSize: 20)),
-                radius: BorderRadius.circular(15),
-                color: SoftColors.blueLight,
-                //textColor: Custom_Colors.blue,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
-          ],
-        ),
-        buttons: []).show();
   }
 
   List<Widget> buildList() {
@@ -180,7 +128,7 @@ class SubjectsListState extends State<SubjectsList> {
             MaterialPageRoute(builder: (context) => MarksList(x)));
         },
         onLongPress: (){
-          showDeleteDialog(x);
+          showDeleteSubjectBottomSheet(x);
         },
       ));
     ret.add(GestureDetector(
@@ -192,6 +140,28 @@ class SubjectsListState extends State<SubjectsList> {
     return ret;
   }
 
+  showDeleteSubjectBottomSheet(Subject delSubj){
+    double screenWidth = MediaQuery.of(context).size.width;
+    double margin = 14;
+    double buttonWidth = (screenWidth - 3*margin)/2;
+    showModalBottomSheet(context: context, builder: (context){
+      return DeleteModalBottomSheet(
+        buttonWidth: buttonWidth,
+        text: 'Вы действительно хотите удалить предмет "${delSubj.name}"?',
+        onTap: () async {
+          int res = await databaseHelper.deleteSubject(delSubj.id);
+          databaseHelper.deleteMarks(delSubj.id);
+          Navigator.of(context).pop();
+          updateListView();
+          scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: (res==1) ? Text("Предмет успешно удалён") : Text("Ошибка"),
+            backgroundColor: (res==1) ? SoftColors.green : SoftColors.red,
+          ));
+        },
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (subjectsList == null) {
@@ -200,6 +170,7 @@ class SubjectsListState extends State<SubjectsList> {
     }
 
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
           actions: <Widget>[
             IconButton(
@@ -233,8 +204,30 @@ class SubjectsListState extends State<SubjectsList> {
           )),
       body: Container(
           decoration: BoxDecoration(color: SoftColors.blueLight),
-          child: ListView(
+          child: (subjectsList.length>0) 
+          ? ListView(
             children: buildList(),
+          )
+          : Container(
+            alignment: Alignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Text("У Вас пока нет добавленных предметов", style: TextStyle(color: SoftColors.blueDark),),
+                SizedBox(height: 14,),
+                SoftButton(
+                  child: Icon(Icons.add, color: SoftColors.blueDark,),
+                  color: SoftColors.blueLight,
+                  height: 60,
+                  width: 60,
+                  onTap: (){
+                    showAddSubject();
+                  },
+                ),
+              ],
+            ),
           ),
         ),
     );

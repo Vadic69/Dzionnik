@@ -4,6 +4,7 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:school_diary/constants.dart';
 import 'package:school_diary/models/bell.dart';
 import 'package:school_diary/services/database_helper.dart';
+import 'package:school_diary/widgets/delete_modal_bottom_sheet.dart';
 
 class EditBells extends StatefulWidget {
   @override
@@ -15,7 +16,7 @@ class EditBells extends StatefulWidget {
 class EditBellsState extends State<EditBells>{
 
   DatabaseHelper dbHelper = DatabaseHelper();
-  GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
   List<Bell> bells = List<Bell>();
 
@@ -29,68 +30,27 @@ class EditBellsState extends State<EditBells>{
 
   void updateBellsList() async {
     bells = await dbHelper.getBells();
+    if (this.mounted)
     setState(() {
     });
   }
 
-  void showDeleteDialog(BuildContext context, int id){
-    showModalBottomSheet(context: context, builder: (BuildContext buildContext){
-      return Container(
-        height: 220,
-        padding: EdgeInsets.all(15),
-        color: SoftColors.blueLight,
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: 60,
-              alignment: Alignment(0,-1),
-              child: Icon(Icons.delete_outline, size: 50,),
-            ),
-            Text(
-              "Вы уверены, что желаете удалить урок из расписания?",
-              style: TextStyle(fontSize: 20),
-              textAlign: TextAlign.center,
-            ),
-            Container(
-                margin: EdgeInsets.only(top: 20),          
-                child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Container(
-                    width: 140,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: SoftColors.red, width: 2),  
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: FlatButton(
-                      onPressed: (){
-                        Navigator.of(context).pop();
-                      },
-                      child: Text("Нет", style: TextStyle(color: SoftColors.red),),
-                    ),
-                  ),
-                  Container(
-                    width: 140,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: SoftColors.red,
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: FlatButton(
-                      onPressed: (){
-                        dbHelper.deleteBell(id);
-                        Navigator.of(context).pop();
-                      },
-                      child: Text("Да", style: TextStyle(color: Colors.white)),
-                    ),
-                  ),
-                  
-                ],
-              ),
-            )
-          ],
-        ),
+  showDeleteBellBottomSheet(int id){
+    double screenWidth = MediaQuery.of(context).size.width;
+    double margin = 14;
+    double buttonWidth = (screenWidth - 3*margin)/2;
+    showModalBottomSheet(context: context, builder: (context){
+      return DeleteModalBottomSheet(
+        buttonWidth: buttonWidth,
+        text: "Вы уверены, что желаете удалить звонок из расписания?",
+        onTap: () async {
+          int res = await dbHelper.deleteBell(id);
+          Navigator.of(context).pop();
+          scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: (res>=0) ? Text("Звонок успешно удалён из расписания") : Text("Ошибка"),
+            backgroundColor: (res>=0) ? SoftColors.green : SoftColors.red,
+          ));
+        },
       );
     });
   }
@@ -98,7 +58,7 @@ class EditBellsState extends State<EditBells>{
   void updateBell(int order, int value, bool b){
     if (b) {
       if (order>0 && value<bells[order-1].end){
-        _key.currentState.showSnackBar(SnackBar(
+        scaffoldKey.currentState.showSnackBar(SnackBar(
           content: Text(
             "Ошибка. Урок должен начинаться после окончания предыдущего.",
             style: TextStyle(
@@ -129,7 +89,7 @@ class EditBellsState extends State<EditBells>{
         dbHelper.updateBell(bells[i+1]);
         i++;
       }
-      _key.currentState.showSnackBar(SnackBar(
+      scaffoldKey.currentState.showSnackBar(SnackBar(
           content: Text(
             "Расписание звонков обновлено",
             style: TextStyle(
@@ -163,7 +123,6 @@ class EditBellsState extends State<EditBells>{
   }
 
   List<Widget> buildList(){
-
     double margin, width, screenWidth;
     screenWidth = MediaQuery.of(context).size.width;
     margin = 20;
@@ -194,10 +153,10 @@ class EditBellsState extends State<EditBells>{
               ),
               alignment: Alignment(0.0,0.0),
               child: FlatButton(
-                  splashColor: SoftColors.red.withOpacity(0.2),
-                  highlightColor: SoftColors.red.withOpacity(0.1),
+                  splashColor: SoftColors.blueDark.withOpacity(0.2),
+                  highlightColor: SoftColors.blueDark.withOpacity(0.1),
                   onPressed: (){
-                    showDeleteDialog(context, bells[i].id);
+                    showDeleteBellBottomSheet(bells[i].id);
                   },
                   child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -287,7 +246,7 @@ class EditBellsState extends State<EditBells>{
   Widget build(BuildContext context) {
     updateBellsList();
     return Scaffold(
-      key: _key,
+      key: scaffoldKey,
       appBar: AppBar(
           centerTitle: true,
           //leading: Logo(),

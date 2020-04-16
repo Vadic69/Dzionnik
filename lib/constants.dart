@@ -9,10 +9,8 @@ class Custom_Colors {
 
 class SoftColors {
   static const blueLight = Color(0xFFF1F3F6);
-  //static const blueDark = Color(0xFF798BCB);
   static const blueDark = Color(0xFF5D78D8);
   static const blueShadow = Color(0xFF3754AA);
-  //static const green = Color(0xFF82DD96);
   static const green = Color(0xFF46B198);
   static const red = Color(0xFFE44652);
 }

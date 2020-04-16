@@ -8,6 +8,7 @@ import 'package:school_diary/models/bell.dart';
 import 'package:school_diary/models/scheduleItem.dart';
 import 'package:school_diary/screens/editBells.dart';
 import 'package:school_diary/services/database_helper.dart';
+import 'package:school_diary/widgets/delete_modal_bottom_sheet.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Timetable extends StatefulWidget {
@@ -18,6 +19,7 @@ class Timetable extends StatefulWidget {
 }
 
 class TimetableState extends State<Timetable> {
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   DatabaseHelper DBhelper = DatabaseHelper();
   Timer timer;
   int currentSelected = 1;
@@ -39,65 +41,34 @@ class TimetableState extends State<Timetable> {
 
   navigateToEditBells(BuildContext context) async {
     final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => EditBells()));
-    updateList();
+    updateBellsList();
+    setState(() {
+    });
   }
 
   void addToDB(ScheduleItem item) async {
     int res = await DBhelper.insertScheduleItem(item);
-    if (res != 0) {
-      print("Success!");
-    } else {
-      print("ERROR!");
-    }
   }
 
-  void showDeleteDialog(ScheduleItem delItem) {
-    Alert(
-        style: AlertStyle(
-          animationType: AnimationType.fromLeft,
-          backgroundColor: SoftColors.blueLight,
-          titleStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-          isCloseButton: false,
-        ),
-        context: context,
-        title: delItem.name,
-        desc: "Желаете удалить выбранный предмет из расписания?",
-        content: Column(
-          children: <Widget>[
-            Container(
-                margin: EdgeInsets.only(bottom: 15, top: 25),
-                decoration: BoxDecoration(boxShadow: UnpressedShadow.shadow),
-                child: DialogButton(
-                  height: 45,
-                  child: Text("Удалить",
-                      style:
-                          TextStyle(color: SoftColors.blueLight, fontSize: 20)),
-                  radius: BorderRadius.circular(15),
-                  color: SoftColors.red.withOpacity(0.8),
-                  //textColor: Colors.white,
-                  onPressed: () {
-                    DBhelper.deleteScheduleItem(delItem.id);
-                    Navigator.of(context).pop();
-                    updateList();
-                  },
-                )),
-            Container(
-              decoration: BoxDecoration(boxShadow: UnpressedShadow.shadow),
-              child: DialogButton(
-                height: 45,
-                child: Text("Отмена",
-                    style: TextStyle(color: Colors.black, fontSize: 20)),
-                radius: BorderRadius.circular(15),
-                color: SoftColors.blueLight,
-                //textColor: Custom_Colors.blue,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
-          ],
-        ),
-        buttons: []).show();
+  showDeleteScheduleBottomSheet(ScheduleItem delItem){
+    double screenWidth = MediaQuery.of(context).size.width;
+    double margin = 14;
+    double buttonWidth = (screenWidth - 3*margin)/2;
+    showModalBottomSheet(context: context, builder: (context){
+      return DeleteModalBottomSheet(
+        buttonWidth: buttonWidth,
+        text: "Вы действительно хотите удалить выбранный предмет из расписания?",
+        onTap: () async {
+          int res = await DBhelper.deleteScheduleItem(delItem.id);
+          Navigator.of(context).pop();
+          updateList();
+          scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: (res>=0) ? Text("Предмет успешно удалён из расписания") : Text("Ошибка"),
+            backgroundColor: (res>=0) ? SoftColors.green : SoftColors.red,
+          ));
+        },
+      );
+    });
   }
 
   void showEditItem(ScheduleItem item, bool add) {
@@ -200,7 +171,6 @@ class TimetableState extends State<Timetable> {
                   start = false;
                   lesson++;
                   if (lesson - 1 >= bells.length) {
-                    print('stop');
                     timer.cancel();
                   } //else counter = bells[lesson - 1].begin - bells[lesson - 2].end;
                 } else {
@@ -223,8 +193,6 @@ class TimetableState extends State<Timetable> {
     }
     int d = 1 - now.weekday;
     while (d <= 0) {
-      //print(-d);
-      //print(now.subtract(Duration(days: -d)).day);
       number.add(now.subtract(Duration(days: -d)).day);
       weekday.add(now.subtract(Duration(days: -d)).weekday);
       active.add(false);
@@ -235,8 +203,6 @@ class TimetableState extends State<Timetable> {
     selected[active.length - 1] = true;
     currentSelected = active.length - 1;
     while (number.length < 6) {
-      //print(-d);
-      //print(now.add(Duration(days: d)).day);
       number.add(now.add(Duration(days: d)).day);
       weekday.add(now.add(Duration(days: d)).weekday);
       active.add(false);
@@ -345,7 +311,7 @@ class TimetableState extends State<Timetable> {
               FlatButton(
                 highlightColor: SoftColors.blueDark.withOpacity(0.1),
                 onLongPress: () {
-                  showDeleteDialog(data[i]);
+                  showDeleteScheduleBottomSheet(data[i]);
                 },
                 onPressed: () {
                   showEditItem(data[i], false);
@@ -395,7 +361,6 @@ class TimetableState extends State<Timetable> {
     ret.add(FlatButton(
       highlightColor: SoftColors.blueDark.withOpacity(0.1),
       onPressed: () {
-        print("press");
         showEditItem(
             ScheduleItem(
               weekday: currentSelected + 1,
@@ -452,6 +417,7 @@ class TimetableState extends State<Timetable> {
     setTimer();
 
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
           actions: <Widget>[
             IconButton(

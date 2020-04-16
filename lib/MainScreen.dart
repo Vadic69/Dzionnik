@@ -19,11 +19,10 @@ List<Widget> screens = [
   SubjectsList(),
   Timetable(),
   Books(),
-  Notifications(),
   SettingsPage(),
 ];
 
-int currentPage = 1;
+int currentPage = 0;
 
 class MainScreenState extends State<MainScreen> {
 
@@ -62,22 +61,10 @@ class MainScreenState extends State<MainScreen> {
               BottomItem(Text('7,3', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: SoftColors.blueDark),), 0),
               BottomItem(Icon(Icons.timer, color: SoftColors.blueDark,), 1),
               BottomItem(Icon(Icons.book, color: SoftColors.blueDark,), 2),
-              BottomItem(Icon(Icons.schedule, color: SoftColors.blueDark,), 3),
-              BottomItem(Icon(Icons.settings, color: SoftColors.blueDark,), 4),
+              BottomItem(Icon(Icons.settings, color: SoftColors.blueDark,), 3),
             ],
           ),
           height: 80,
-          /*decoration: BoxDecoration(
-              color: SoftColors.blueLight,
-              boxShadow: [
-                BoxShadow(
-                    offset: Offset(0,-5),
-                    color: SoftColors.blueLight,
-                    spreadRadius: 8,
-                    blurRadius: 10
-                )
-              ]
-          ),*/
         ),
       ),
       body: screens[currentPage],

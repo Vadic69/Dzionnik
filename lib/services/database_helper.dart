@@ -13,7 +13,7 @@ class DatabaseHelper{
   static DatabaseHelper _dataBaseHelper;
   static Database _database;
 
-  String tableName = "subjects";
+  String subjects = "subjects";
   String name = "name";
   String id = "id";
   String averageScore = "averageMark";
@@ -67,7 +67,7 @@ class DatabaseHelper{
   }
 
   void _createDB(Database db, int version) async {
-    await db.execute('CREATE TABLE $tableName($id INTEGER PRIMARY KEY AUTOINCREMENT, $name TEXT, $averageScore FLOAT, $marksKol INTEGER)');
+    await db.execute('CREATE TABLE $subjects($id INTEGER PRIMARY KEY AUTOINCREMENT, $name TEXT, $averageScore FLOAT, $marksKol INTEGER)');
     await db.execute('CREATE TABLE $marks($markId INTEGER PRIMARY KEY AUTOINCREMENT, $value INTEGER, $subjectId INTEGER)');
     await db.execute('CREATE TABLE $scheduleitems($id INTEGER PRIMARY KEY AUTOINCREMENT, $weekday INTEGER, $name TEXT)');
     await db.execute('CREATE TABLE $bells($id INTEGER PRIMARY KEY AUTOINCREMENT, $begin INTEGER, $end INTEGER)');
@@ -76,33 +76,33 @@ class DatabaseHelper{
 
   Future <List<Map<String,dynamic>>> getSubjectsMapList() async{
     Database db = await this.database;
-    var result = await db.rawQuery('SELECT * FROM $tableName order by $id ASC');
+    var result = await db.rawQuery('SELECT * FROM $subjects order by $id ASC');
     return result;
   }
 
   Future <int> insertSubject(Subject subject) async {
     Database db = await this.database;
-    var result = await db.insert(tableName, subject.toMap());
+    var result = await db.insert(subjects, subject.toMap());
     return result;
   }
 
   Future<int> updateSubject(Subject subject) async
   {
     var db = await this.database;
-    var result = await db.update(tableName, subject.toMap(), where: '$id = ?',whereArgs: [subject.id]);
+    var result = await db.update(subjects, subject.toMap(), where: '$id = ?',whereArgs: [subject.id]);
     return result;
   }
 
   Future<int> deleteSubject(int rId) async
   {
     var db = await this.database;
-    var result = await db.rawDelete('DELETE FROM $tableName WHERE $id = $rId');
+    var result = await db.rawDelete('DELETE FROM $subjects WHERE $id = $rId');
     return result;
   }
 
   Future<int> getCount() async {
     Database db = await this.database;
-    List<Map<String, dynamic>> x = await db.rawQuery('SELECT COUNT (*) from $tableName');
+    List<Map<String, dynamic>> x = await db.rawQuery('SELECT COUNT (*) from $subjects');
     int result = Sqflite.firstIntValue(x);
     return result;
   }
@@ -258,10 +258,10 @@ class DatabaseHelper{
     return result;
   }
 
-  Future<int> deleteBook(int rId) async
+  Future<int> deleteBook(String rId) async
   {
     var db = await this.database;
-    var result = await db.rawDelete('DELETE FROM $books WHERE $id = $rId');
+    var result = await db.rawDelete('DELETE FROM $books WHERE $id = "$rId"');
     return result;
   }
 
@@ -273,6 +273,45 @@ class DatabaseHelper{
       list.add(Book.fromMap(bookMapList[i]));
     return list;
   }
-  
+  // clear tables
+
+  Future<int> clearBooksTable() async
+  {
+    var db = await this.database;
+    var result = await db.rawDelete('DELETE FROM $books');
+    return result;
+  }
+
+  Future<int> clearSubjectsTable() async
+  {
+    var db = await this.database;
+    var result = await db.rawDelete('DELETE FROM $subjects');
+    return result;
+  }
+
+  Future<int> clearMarksTable() async
+  {
+    var db = await this.database;
+    var result = await db.rawDelete('DELETE FROM $marks');
+    var result2 = await db.rawUpdate('UPDATE $subjects SET $averageScore = 0.0');
+    var result3 = await db.rawUpdate('UPDATE $subjects SET $marksKol = 0');
+    return (result);
+  }
+
+  Future<int> clearScheduleTable() async
+  {
+    var db = await this.database;
+    var result = await db.rawDelete('DELETE FROM $scheduleitems');
+    return result;
+  }
+
+  Future<int> clearBellsTable() async
+  {
+    var db = await this.database;
+    var result = await db.rawDelete('DELETE FROM $bells');
+    return result;
+  }
+
+
 
 }

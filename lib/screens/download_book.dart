@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -9,7 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:school_diary/constants.dart';
 import 'package:school_diary/models/book.dart';
 import 'package:school_diary/services/database_helper.dart';
-import 'package:school_diary/services/firestore_helper.dart';
 import 'package:school_diary/widgets/soft_button.dart';
 import 'package:school_diary/widgets/soft_listTile.dart';
 
@@ -27,14 +23,21 @@ class DownloadBooks extends StatefulWidget{
 
 class DownloadBooksState extends State<DownloadBooks>{
 
+  DownloadBooksState({this.dir, this.local});
+
   String dir;
   List<Book> local, data;
-
-  DownloadBooksState({this.dir, this.local});
+  int mn=1,mx=11;
+  String subjectFilter = "Предмет";
+  String subjectSelected = "Предмет";
+  String formFilter = "Класс";
+  Set<String> subjects = Set<String>();
+  int maxLen=20;
+  
   DatabaseHelper dblocal = DatabaseHelper();
   List<String> percents = List<String>();
   Set<String> inLocal = Set<String>();
-  FirestoreHelper db = FirestoreHelper();
+  Map<String, String> filterFromValue = Map<String, String>();
 
   bool loading = true;
 
@@ -73,13 +76,12 @@ class DownloadBooksState extends State<DownloadBooks>{
         });
       });
     } catch (e) {
-      print(e.toString());
+      
     }
     if (!this.mounted)
       return;
 
     inLocal.add(book.id);
-    print(book.id);
     await dblocal.insertBook(book);
   }
 
@@ -108,11 +110,85 @@ class DownloadBooksState extends State<DownloadBooks>{
     return ret;
   }
 
+  List<DropdownMenuItem<String>> buildFormsDropdownItems(){
+    List<DropdownMenuItem<String>> ret = List<DropdownMenuItem<String>>();
+    List<String> forms = [
+      "Класс",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+    ];
+    for (int i=0; i<forms.length; i++){
+      ret.add(DropdownMenuItem(
+        value: forms[i],
+        child: Text(forms[i]),
+      ));
+    }
+
+    return ret;
+  }
+
+  String truncate(int maxLen, String val){
+    if (val.length>maxLen)
+      val = val.substring(0,maxLen-3)+"...";
+    
+    return val;
+  }
+
+  List<DropdownMenuItem<String>> buildSubjectsDropdownItems(){
+    List<DropdownMenuItem<String>> ret = List<DropdownMenuItem<String>>();
+    ret.add(DropdownMenuItem(
+        value: "Предмет",
+        child: Text(
+          "Предмет",
+          ),
+      ));
+    for (String subj in subjects){
+      String txt= truncate(maxLen, subj);
+      filterFromValue[txt]=subj;
+      ret.add(DropdownMenuItem(
+        value: txt,
+        child: Text(txt),
+      ));
+    }
+
+    return ret;
+  }
+
   updateList() async {
     data = List<Book>();
-    QuerySnapshot ref = await Firestore.instance.collection("books").getDocuments();
+    percents = List<String>();
+    //QuerySnapshot ref = await Firestore.instance.collection("books").getDocuments();
+    QuerySnapshot ref;
+    if (subjectFilter=="Предмет")
+      ref = await 
+        Firestore
+        .instance
+        .collection("books")
+        .where('form', isGreaterThanOrEqualTo: mn)
+        .where('form', isLessThanOrEqualTo: mx)
+        .getDocuments();
+    else
+      ref = await 
+        Firestore
+        .instance
+        .collection("books")
+        .where('form', isGreaterThanOrEqualTo: mn)
+        .where('form', isLessThanOrEqualTo: mx)
+        .where('subject', isEqualTo: subjectFilter)
+        .getDocuments();
+
     for (int i=0; i<ref.documents.length; i++){
       data.add(Book.fromFirestore(ref.documents[i]));
+      subjects.add(data[data.length-1].subject);
       percents.add("");
     }
     for (int i=0; i<local.length; i++)
@@ -136,6 +212,7 @@ class DownloadBooksState extends State<DownloadBooks>{
     if (data==null){
       loadData();
     }
+    double deviceWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
           centerTitle: true,
@@ -166,24 +243,56 @@ class DownloadBooksState extends State<DownloadBooks>{
             // Фильтры
             Container(
               height: 70,
+              padding: EdgeInsets.only(left: 14, right: 14),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   SoftButton(
-                    child: Text("Класс", style: TextStyle(fontSize: 18),),
+                    child: DropdownButton(
+                      underline: Container(height: 0,),
+                      items: buildFormsDropdownItems(),
+                      value: formFilter,
+                      onChanged: (String newValue){
+                        if (newValue=="Класс"){
+                          mn=1; mx=11;
+                        } else {
+                          int x=int.parse(newValue);
+                          mx=x; mx=x; 
+                        }
+                        setState(() {
+                          formFilter = newValue;
+                          loading=true;
+                          loadData();
+                        });
+                      }, 
+                      
+                    ),
                     color: SoftColors.blueLight,
-                    width: (MediaQuery.of(context).size.width/2)-30,
+                    width: (deviceWidth-42)-240,
                     height: 40,
                     onTap: (){
-                      
                     },
                   ),
                   SoftButton(
-                    child: Text("Предмет", style: TextStyle(fontSize: 18),),
+                    child: DropdownButton(
+                      underline: Container(height: 0,),
+                      items: buildSubjectsDropdownItems(),
+                      value: (subjectSelected.isNotEmpty) ? subjectSelected : null,
+                      onChanged: (String newValue){
+                        setState(() {
+                          subjectFilter = filterFromValue[newValue];
+                          subjectSelected = truncate(maxLen, newValue);
+                          loading=true;
+                          loadData();
+                        });
+                      }, 
+                      
+                    ),
                     color: SoftColors.blueLight,
-                    width: (MediaQuery.of(context).size.width/2)-30,
+                    width: 240,
                     height: 40,
-                    onTap: (){},
+                    onTap: (){
+                    },
                   )
                 ],
               ),
@@ -194,7 +303,7 @@ class DownloadBooksState extends State<DownloadBooks>{
               ? Container(
                 height: 200, 
                 child: Center(child: CircularProgressIndicator(
-                  valueColor: new AlwaysStoppedAnimation<Color>(SoftColors.blueDark),
+                  valueColor: AlwaysStoppedAnimation<Color>(SoftColors.blueDark),
                 )),
               ) 
               : Expanded(

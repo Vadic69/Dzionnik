@@ -34,6 +34,14 @@ class SchoolDiary extends StatelessWidget {
             const Locale('ru'), // English
           ],
         home: MainScreen(),
-        theme: ThemeData(fontFamily: "Montserrat", primaryColor: SoftColors.blueDark,));
+        theme: ThemeData(
+          fontFamily: "Montserrat", 
+          brightness: Brightness.light,
+          primaryColor: Color(0xFF46B198),
+          backgroundColor: Color(0xFFF1F3F6),
+          disabledColor: Color(0xFFF1F3F6),
+          accentColor: Color(0xFF5D78D8),
+        )
+    );
   }
 }

@@ -6,9 +6,9 @@ class SoftListTile extends StatelessWidget{
 
   final Function onTap, onLongPress;
   final String leading, title, subtitle;
-  final Widget trailing;
+  final Widget trailing, leadingWidget;
 
-  SoftListTile({this.onTap, this.leading, this.subtitle, this.title, this.onLongPress, this.trailing});
+  SoftListTile({this.onTap, this.leading, this.subtitle, this.title, this.onLongPress, this.trailing, this.leadingWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +38,25 @@ class SoftListTile extends StatelessWidget{
                     color: SoftColors.green
                   ),
                   child: Center(
-                    child: Text(leading, style: TextStyle(color: Colors.white, fontSize: 20),),
+                    child: (leadingWidget==null) 
+                    ? Text(leading, style: TextStyle(color: Colors.white, fontSize: 20),)
+                    : leadingWidget,
                   ),
                 ),
-                title: Text(title),
-                subtitle: subtitle==null ? null : Text(subtitle),
+                title: Text(
+                  title,
+                  overflow: TextOverflow.fade,
+                  maxLines: 1,
+                  softWrap: false,
+                  ),
+                subtitle: subtitle==null 
+                ? null 
+                : Text(
+                  subtitle,
+                  overflow: TextOverflow.fade,
+                  maxLines: 1,
+                  softWrap: false,
+                ),
                 trailing: trailing,
           ),
             ),
