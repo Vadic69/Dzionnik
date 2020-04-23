@@ -5,6 +5,7 @@ import 'package:school_diary/constants.dart';
 import 'package:school_diary/models/bell.dart';
 import 'package:school_diary/services/database_helper.dart';
 import 'package:school_diary/widgets/delete_modal_bottom_sheet.dart';
+import 'package:school_diary/widgets/soft_button.dart';
 
 class EditBells extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class EditBellsState extends State<EditBells>{
 
   DatabaseHelper dbHelper = DatabaseHelper();
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  double itemWidth, itemHeight=122;
 
   List<Bell> bells = List<Bell>();
 
@@ -125,125 +127,112 @@ class EditBellsState extends State<EditBells>{
   List<Widget> buildList(){
     double margin, width, screenWidth;
     screenWidth = MediaQuery.of(context).size.width;
-    margin = 20;
-    width = ((screenWidth-4*margin)/2)-1;
-
-    TextStyle timeStyle = TextStyle(
-      color: SoftColors.blueDark, 
-      fontSize: 16
-    );
+    margin = 14;
+    width = ((screenWidth-3*margin)/2);
 
     List<Widget> ret = List<Widget>();
+    
     for (int i=0; i<bells.length; i++)
-      ret.add(Container(
-        decoration: BoxDecoration(
-          boxShadow: UnpressedShadow.shadow,
-          color: SoftColors.blueLight,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        margin: EdgeInsets.all(margin),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Container(
-              width: width/2,
-              height: width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30))
+    ret.add(Container(
+      decoration: BoxDecoration(
+        boxShadow: UnpressedShadow.shadow,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: <Widget>[
+          Container(
+            child: SoftButton(
+              onTap: (){
+                showDeleteBellBottomSheet(bells[i].id);
+              },
+              color: SoftColors.blueLight,
+              enableShadow: false,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20),
+                topLeft: Radius.circular(20),
               ),
-              alignment: Alignment(0.0,0.0),
-              child: FlatButton(
-                  splashColor: SoftColors.blueDark.withOpacity(0.2),
-                  highlightColor: SoftColors.blueDark.withOpacity(0.1),
-                  onPressed: (){
-                    showDeleteBellBottomSheet(bells[i].id);
-                  },
-                  child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text((i+1).toString(), style: TextStyle(fontSize: 30),),
-                    Text("Урок")
-                  ],
-                ),
+              width: width,
+              height: 60,
+              child: Text(
+                "${i+1} урок",
+                style: TextStyle(fontSize: 18),
               ),
             ),
-            Container(
-              color: SoftColors.blueDark.withOpacity(0.2),
-              width: 1,
-              height: width,
-            ),
-            Column(
+          ),
+          Container(height: 1, color: SoftColors.blueDark.withOpacity(0.5)),
+          Container(
+            child: Row(
               children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(30))
+                SoftButton(
+                  color: SoftColors.blueLight,
+                  enableShadow: false,
+                  width: (width/2)-0.5,
+                  height: 60,
+                  child: Text(
+                    getTime(bells[i].begin),
+                    style: TextStyle(
+                      color: SoftColors.blueDark
+                    ),  
                   ),
-                  width: width/2,
-                  height: width/2,
-                  child: FlatButton(
-                    splashColor: SoftColors.blueDark.withOpacity(0.2),
-                    highlightColor: SoftColors.blueDark.withOpacity(0.1),
-                    onPressed: () {
-                      selectTime(context, i, true);
-                    },
-                    child: Container(
-                      child: Text(getTime(bells[i].begin), style: timeStyle),
-                    ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20)
                   ),
+                  onTap: (){
+                    selectTime(context, i, true);
+                  },
                 ),
-                Container(
-                  height: 1,
-                  width: width/2,
-                  color: SoftColors.blueDark.withOpacity(0.2),
-                ),
-                Container(
-                  width: width/2,
-                  height: width/2,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(bottomRight: Radius.circular(30))
+                
+                Container(width: 1, color: SoftColors.blueDark.withOpacity(0.5), height: 60,),
+                SoftButton(
+                  color: SoftColors.blueLight,
+                  enableShadow: false,
+                  height: 60,
+                  width: (width/2)-0.5,
+                  child: Text(
+                    getTime(bells[i].end),
+                    style: TextStyle(
+                      color: SoftColors.blueDark
+                    ),  
                   ),
-                  child: FlatButton(
-                    splashColor: SoftColors.blueDark.withOpacity(0.2),
-                    highlightColor: SoftColors.blueDark.withOpacity(0.1),
-                    onPressed: () {
-                      selectTime(context, i, false);
-                    },
-                    child: Container(
-                      child: Text(getTime(bells[i].end), style: timeStyle),
-                    ),
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(20)
                   ),
+                  onTap: (){
+                    selectTime(context, i, false);
+                  },
                 )
               ],
-            )
-          ],
-        ),
+            ),
+          )
+        ],
+      ),
     ));
 
-    ret.add(Container(
-        decoration: BoxDecoration(
-          boxShadow: UnpressedShadow.shadow,
-          color: SoftColors.blueLight,
-          borderRadius: BorderRadius.circular(30)
-        ),
-        margin: EdgeInsets.all(margin),
-        child: FlatButton(
-          child: Icon(Icons.add, color: SoftColors.blueDark, size: 30,),
-          onPressed: (){
-            Bell newBell = (bells.length>0) 
+    ret.add(
+      SoftButton(
+        height: 121,
+        color: SoftColors.blueLight,
+        borderRadius: BorderRadius.circular(20),
+        child: Icon(Icons.add, color: SoftColors.blueDark,),
+        onTap: (){
+          Bell newBell = (bells.length>0) 
             ? Bell(begin: bells[bells.length-1].end+10, end: bells[bells.length-1].end+55) 
             : Bell(begin: 60*8, end: 60*8+45);
             dbHelper.insertBell(newBell);
             setState(() {
             });
-          },
-        ),
-    ));
+        },
+      )
+    );
 
     return ret;
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double margin = 14;
+    itemWidth = ((screenWidth-3*margin)/2)-2;
     updateBellsList();
     return Scaffold(
       key: scaffoldKey,
@@ -269,8 +258,13 @@ class EditBellsState extends State<EditBells>{
           )),
       body: Container(
         color: SoftColors.blueLight,
-        child: GridView.count(crossAxisCount: 2,
+        child: GridView.count(
+          padding: EdgeInsets.all(14),
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+          crossAxisCount: 2,
           children: buildList(),
+          childAspectRatio: (itemWidth/itemHeight),
         ),
       )
       );

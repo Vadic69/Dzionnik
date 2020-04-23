@@ -11,7 +11,7 @@ description: Smart school diary
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.1.0+1
+version: 1.1.2+1
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -37,6 +37,8 @@ dependencies:
   advance_pdf_viewer: ^1.1.6
 
   dio: ^3.0.9
+
+  intl: ^0.16.0
 
 
 
@@ -65,7 +67,6 @@ flutter:
 
   assets:
     - assets/Dzlogo.svg
-    - assets/books/
 
 
   # The following line ensures that the Material Icons font is

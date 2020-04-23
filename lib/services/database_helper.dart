@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:school_diary/models/bell.dart';
 import 'package:school_diary/models/book.dart';
+import 'package:school_diary/models/hometask.dart';
 import 'package:school_diary/models/mark.dart';
 import 'package:school_diary/models/scheduleItem.dart';
 import 'package:school_diary/models/subject.dart';
@@ -39,6 +40,8 @@ class DatabaseHelper{
   String books = "books";
   String subject = "subject";
 
+  String hometask = "hometask";
+
 
   DatabaseHelper._createInstance();
 
@@ -58,12 +61,25 @@ class DatabaseHelper{
     return _database;
   }
 
+  var migrationScripts = [
+    'CREATE TABLE hometask(id INTEGER PRIMARY KEY, subject TEXT, dateTime TEXT, value TEXT)'
+  ];
+
   Future<Database> inicializeDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String path = directory.path + 'schoolDiary.db';
+    String path = directory.path + 'dzionnik.db';
 
-    var subjDB = await openDatabase(path, version: 2, onCreate: _createDB);
-    return subjDB;
+    var DB = await openDatabase(
+        path,
+        version: migrationScripts.length+1,
+        onCreate: _createDB,
+        onUpgrade: (Database db, int oldV, int newV) async {
+          print("Old version: $oldV, new: $newV");
+          for (int i=oldV-1; i<newV; i++)
+            await db.execute(migrationScripts[i]);
+      }
+    );
+    return DB;
   }
 
   void _createDB(Database db, int version) async {
@@ -72,6 +88,7 @@ class DatabaseHelper{
     await db.execute('CREATE TABLE $scheduleitems($id INTEGER PRIMARY KEY AUTOINCREMENT, $weekday INTEGER, $name TEXT)');
     await db.execute('CREATE TABLE $bells($id INTEGER PRIMARY KEY AUTOINCREMENT, $begin INTEGER, $end INTEGER)');
     await db.execute('CREATE TABLE $books($id TEXT, $form INTEGER, $fileName TEXT, $author TEXT, $language INTEGER, $subject TEXT)');
+    await db.execute('CREATE TABLE hometask(id INTEGER PRIMARY KEY, subject TEXT, dateTime TEXT, value TEXT)');
   }
 
   Future <List<Map<String,dynamic>>> getSubjectsMapList() async{
@@ -273,6 +290,36 @@ class DatabaseHelper{
       list.add(Book.fromMap(bookMapList[i]));
     return list;
   }
+
+  // helper for hometask
+  Future <List<Map<String,dynamic>>> getHometaskMapList() async{
+    Database db = await this.database;
+    var result = await db.rawQuery('SELECT * FROM $hometask');
+    return result;
+  }
+
+  Future <int> insertHometask(Hometask ht) async {
+    Database db = await this.database;
+    var result = await db.insert(hometask, ht.toMap());
+    return result;
+  }
+
+  Future<int> deleteHometask(int rId) async
+  {
+    var db = await this.database;
+    var result = await db.rawDelete('DELETE FROM $hometask WHERE $id = "$rId"');
+    return result;
+  }
+
+  Future<List<Hometask>> getHometaskList() async {
+    var hometaskMapList = await getHometaskMapList();
+    int count = hometaskMapList.length;
+    List<Hometask> list = List<Hometask>();
+    for (int i=0; i<count; i++)
+      list.add(Hometask.fromMap(hometaskMapList[i]));
+    return list;
+  }
+
   // clear tables
 
   Future<int> clearBooksTable() async

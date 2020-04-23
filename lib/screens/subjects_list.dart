@@ -105,6 +105,7 @@ class SubjectsListState extends State<SubjectsList> {
 
   void updateListView() async {
     subjectsList = await databaseHelper.getSubjectsList();
+    if (this.mounted)
     setState(() {
     });
   }

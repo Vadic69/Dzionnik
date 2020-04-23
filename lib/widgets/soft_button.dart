@@ -8,13 +8,17 @@ class SoftButton extends StatelessWidget{
   final Color color;
   final Widget child;
   final double width, height;
+  final BorderRadius borderRadius;
+  final bool enableShadow;
 
   SoftButton({
     this.onTap, 
     this.child, 
     this.height, 
     this.width, 
-    this.color
+    this.color,
+    this.borderRadius,
+    this.enableShadow
   });
 
   @override
@@ -24,14 +28,15 @@ class SoftButton extends StatelessWidget{
       height: height,
       decoration: BoxDecoration(
         color: SoftColors.blueLight,
-        borderRadius: BorderRadius.all(Radius.circular(height/2)),
-        boxShadow: UnpressedShadow.shadow),
+        borderRadius: (borderRadius==null) ? BorderRadius.circular(height/2) : borderRadius, 
+        boxShadow: (enableShadow==null || enableShadow==true) ? UnpressedShadow.shadow : null
+      ),
           child: Material(
             color: color,
-            borderRadius: BorderRadius.circular(height/2),
+            borderRadius: (borderRadius==null) ? BorderRadius.circular(height/2) : borderRadius, 
             child: InkWell(
              customBorder: RoundedRectangleBorder(
-               borderRadius: BorderRadius.circular(height/2)
+               borderRadius: (borderRadius==null) ? BorderRadius.circular(height/2) : borderRadius
              ),
             onTap: onTap,
             child: Container(

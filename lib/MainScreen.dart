@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:school_diary/functions.dart';
 import 'package:school_diary/screens/books.dart';
 import 'package:school_diary/screens/notifications.dart';
@@ -20,6 +21,7 @@ List<Widget> screens = [
   Timetable(),
   Books(),
   SettingsPage(),
+  Notifications()
 ];
 
 int currentPage = 0;
@@ -62,6 +64,10 @@ class MainScreenState extends State<MainScreen> {
               BottomItem(Icon(Icons.timer, color: SoftColors.blueDark,), 1),
               BottomItem(Icon(Icons.book, color: SoftColors.blueDark,), 2),
               BottomItem(Icon(Icons.settings, color: SoftColors.blueDark,), 3),
+              BottomItem(
+                Container(
+                  child: SvgPicture.asset('assets/Dzlogo.svg', width: 30,),
+                ), 4),
             ],
           ),
           height: 80,

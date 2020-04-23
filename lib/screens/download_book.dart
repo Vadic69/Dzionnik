@@ -257,7 +257,7 @@ class DownloadBooksState extends State<DownloadBooks>{
                           mn=1; mx=11;
                         } else {
                           int x=int.parse(newValue);
-                          mx=x; mx=x; 
+                          mn=x; mx=x;
                         }
                         setState(() {
                           formFilter = newValue;
